@@ -1,0 +1,82 @@
+{% load static %}
+
+<!DOCTYPE html>
+
+<html lang="en">
+
+    <head>
+        <link rel="stylesheet" type="text/css" href="{% static "django_simple_bulk_emailer/css/django_simple_bulk_emailer_preview.css" %}">
+        {% block head_tags %}{% endblock %}
+    </head>
+
+    <body {% block body_tag %}{% endblock %}>
+
+        <div id="emailer_preview">
+
+            <p>
+                Sending history:
+            </p>
+
+            {% if  email_instance.sending %}
+
+                <ul>
+                    <li>
+                        Email currently is being sent.
+                    </li>
+                </ul>
+
+            {% endif %}
+
+            {% if email_instance.send_history %}
+
+                {{ email_instance.send_history|safe }}
+
+            {% else %}
+
+                {% if not email_instance.sending %}
+
+                    <ul>
+                        <li>
+                            Email has not been sent.
+                        </li>
+                    </ul>
+
+                {% endif %}
+
+            {% endif %}
+
+            {% if perms.django_simple_bulk_emailer.change_bulkemail %}
+
+                {% if not email_instance.sending %}
+
+                    <form method="post">
+
+                        {% csrf_token %}
+
+                        <p>
+                            <input type="submit" name="send_email" value="{% if email_instance.sent %}Send email again{% else %}Send email{% endif %}">
+                        </p>
+
+                    </form>
+
+                {% endif %}
+
+            {% endif %}
+
+            <form method="post">
+
+                {% csrf_token %}
+
+                <p>
+                    <input type="submit" name="return_list" value="Return to list">
+                </p>
+
+            </form>
+
+        </div>
+
+        {% block content %}{% endblock %}
+
+    </body>
+
+</html>

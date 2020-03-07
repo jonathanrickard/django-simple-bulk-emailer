@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}Manage Subscriptions{% endblock %}
+
+{% block emailer_head %}
+    <link rel="stylesheet" type="text/css" href="{% static "django_simple_bulk_emailer/css/django_simple_bulk_emailer.css" %}">
+{% endblock %}
+
+{% block content %}
+
+    <div id="emailer_content">
+
+        <h1>
+            Manage Subscriptions
+        </h1>
+
+        <form method="post">
+
+            {% csrf_token %}
+
+            <p>
+                First name:
+                <br>
+                <input type="text" id="emailer_input" name="first_name" value="{{ subscriber.first_name }}">
+                {% if form.first_name.errors %}
+                    <br>
+                    <span id="emailer_error">
+                        Please enter a first name
+                    </span>
+                {% endif %}
+            </p>
+
+            <p>
+                Last name:
+                <br>
+                <input type="text" id="emailer_input" name="last_name" value="{{ subscriber.last_name }}">
+                {% if form.last_name.errors %}
+                    <br>
+                    <span id="emailer_error">
+                        Please enter a last name
+                    </span>
+                {% endif %}
+            </p>
+
+            <p>
+                Email address:
+                <br>
+                <input type="text" id="emailer_input" name="subscriber_email" value="{{ subscriber.subscriber_email }}">
+                {% if form.subscriber_email.errors %}
+                    <br>
+                    <span id="emailer_error">
+                        Please enter a valid email address
+                    </span>
+                {% endif %}
+            </p>
+
+            <p>
+                Subscriptions:
+            </p>
+
+            {% for choice in form.subscription_choices %}
+                <p>
+                    {{ choice.tag }} {{ choice.choice_label }}
+                </p>
+            {% endfor %}
+
+            <br>
+
+            <p>
+                <input type="submit" name="submit" value="Save">
+            </p>
+
+            <br>
+
+            <p>
+                <input type="submit" name="unsubscribe_all" value="Unsubscribe from all">
+            </p>
+
+        </form>
+
+    </div>
+
+{% endblock %}

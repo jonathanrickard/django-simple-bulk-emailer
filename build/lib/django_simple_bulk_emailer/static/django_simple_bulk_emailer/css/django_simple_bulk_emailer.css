@@ -1,0 +1,139 @@
+@charset "UTF-8";
+
+
+#emailer_content {
+    background-color: #ffffff;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    word-break: normal;
+    overflow: hidden;
+    padding: 0 0 2em 0;
+}
+
+#emailer_content h1 {
+    font-size: 1.5em;
+    font-weight: 500;
+    margin: 0.75em 0 0.75em 0;
+}
+
+#emailer_content h2 {
+    font-size: 1.25em;
+    font-weight: 500;
+    margin: 1.25em 0 0.75em 0;
+}
+
+#emailer_content h3 {
+    font-size: 1em;
+    font-weight: 600;
+    margin: 1.25em 0 -0.75em 0;
+}
+
+#emailer_content p {
+    font-size: 1em;
+    line-height: 1.4em;
+}
+
+#emailer_content ul {
+    margin: 0 0 0 0;
+    line-height: 1.4em;
+}
+
+#emailer_content ul li {
+    list-style: disc;
+    margin: 0 0 0.25em 0;
+}
+
+#emailer_content ul li ul {
+    margin: 1.2em 0 0 0;
+}
+
+#emailer_content ul li ul li {
+    list-style: circle;
+    margin: 0 0 0.5em 0;
+}
+
+#emailer_content ol {
+    margin: 0 0 0 0;
+    line-height: 1.4em;
+}
+
+#emailer_content ol li {
+    margin: 0 0 0.25em 0;
+}
+
+#emailer_content ol li ol {
+    margin: 1.2em 0 0 0;
+}
+
+#emailer_content ol li ol li {
+    margin: 0 0 0.5em 0;
+}
+
+#emailer_content > a, a:link, a:visited, a:active, a:hover {
+    color:#656565;
+    text-decoration: underline;
+}
+
+#emailer_content button, input[type='submit'] {
+	font-size: 0.75em;
+	font-weight: 500;
+	padding: 0.4em 0.8em;
+	color: #656565;
+	background-color: #ededed;
+	border: 0;
+	border-radius: 0.2em;
+	cursor: pointer;
+    -webkit-appearance: none;
+}
+
+#emailer_error {
+    font-size: 0.75em;
+    color: #FF0000;
+    margin: -1em 0 0 0;
+}
+
+#emailer_dateline {
+    font-size: 0.75em;
+    margin: -1.1em 0 0 0;
+}
+
+#emailer_document {
+    padding: 0 0 0 1.8em;
+}
+
+#emailer_breadcrumb {
+    font-size: 0.75em;
+    margin: -1em 0 0 0;
+}
+
+#emailer_input {
+    width: 25em;
+}
+
+/* Begin hidden field */
+#emailer_hp_input {
+    display: none;
+}
+/* End hidden field */
+
+.emailer_image {
+    display: block;
+    float: right;
+    width: 100%;
+    max-width: 400px;
+    margin: 1.2em 0 2em 2em;
+}
+
+.emailer_image.small {
+    width: 200px;
+}
+
+.emailer_image.mobile {
+    float: none;
+    margin: 2em 0 1.25em 0;
+}
+
+#emailer_caption {
+    margin-top: 0.5em;
+    font-size: 0.85em;
+    word-break: normal;
+}

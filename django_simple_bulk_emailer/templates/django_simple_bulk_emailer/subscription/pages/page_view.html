@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}{{ email_instance.headline }}{% endblock %}
+
+{% block emailer_head %}
+
+    <link rel="stylesheet" type="text/css" href="{% static "django_simple_bulk_emailer/css/django_simple_bulk_emailer.css" %}">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <meta property="og:type" content="article">
+    <meta property="og:description" content="{{ email_instance.first_paragraph }}">
+    <meta property="og:title" content="{{ email_instance.headline }}">
+    {% if email_instance.email_image %}
+        <meta property="og:image" content="{{ email_instance.media_domain }}{{ email_instance.email_image.image_url }}">
+        <meta property="og:image:url" content="{{ email_instance.media_domain }}{{ email_instance.email_image.image_url }}">
+        <meta property="og:image:type" content="{{ email_instance.email_image.content_type }}">
+        <meta property="og:image:width" content="{{ email_instance.email_image.image_width }}">
+        <meta property="og:image:height" content="{{ email_instance.email_image.image_height }}">
+        <meta property="og:image:alt" content="{{ email_instance.email_image.description }}">
+    {% elif default_image %}
+        <meta property="og:image" content="{{ default_image }}">
+        <meta property="og:image:type" content="{{ default_type }}">
+        <meta property="og:image:width" content="{{ default_width }}">
+        <meta property="og:image:height" content="{{ default_height }}">
+        <meta property="og:image:alt" content="{{ default_alt }}">
+    {% endif %}
+
+{% endblock %}
+
+{% block content %}
+
+    <div id="emailer_content">
+
+        <span id="emailer_breadcrumb">
+            <a href="{{ email_instance.subscription_url }}">{{ email_instance.subscription_list }}</a>
+        </span>
+
+        <h1>
+            {{ email_instance.headline }}
+        </h1>
+
+        <div id="emailer_dateline">
+            {{ email_instance.publication_date|date:"l, N j, Y" }}
+        </div>
+
+        {% if email_instance.email_image %}
+                <div class="emailer_image{% if email_instance.email_image.image_width == 200 %} small{% endif %}">
+
+                    <img width="100%" src="{{ email_instance.email_image.image_url }}" alt="{{ email_instance.email_image.description }}">
+
+                    {% if email_instance.email_image.caption %}
+                        <div id="emailer_caption">
+                            {{ email_instance.email_image.caption }}
+                        </div>
+                    {% endif %}
+
+                </div>
+        {% endif %}
+
+        {{ email_instance.body_text|safe }}
+
+        {% if email_instance.email_documents %}
+            <h3>
+                Related documents
+            </h3>
+            <br>
+            {% for document in email_instance.email_documents %}
+                <p id="emailer_document">
+                    <img src="{% static "django_simple_bulk_emailer/images/file_icon_12x12.png" %}" alt="Document">
+                    <a href="{{ document.file_url }}" target="_blank">{{ document.title }}</a>&nbsp;&nbsp;{{ document.extra_text }}
+                </p>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+{% endblock %}
+
+{% block emailer_foot %}
+    <script type="text/javascript" src="{% static "django_simple_bulk_emailer/js/django_simple_bulk_emailer.js" %}"></script>
+{% endblock %}

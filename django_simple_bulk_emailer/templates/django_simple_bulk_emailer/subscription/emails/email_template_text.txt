@@ -1,0 +1,18 @@
+{{ email_instance.headline }}
+
+{{ email_instance.body_text|striptags }}
+{% if email_instance.email_documents %}
+Related documents
+{% for document in email_instance.email_documents %}
+{{ document.title }}{% if document.extra_text %} {{ document.extra_text }}{% endif %}:
+{{ email_instance.media_domain }}{{ document.file_url }}
+{% endfor %}{% endif %}
+
+To view this email in a web browser, go to:
+{{ protocol_domain }}{{ email_instance.page_url }}
+
+To manage your subscriptions, go to:
+{{ subscriptions_url }}
+
+To unsubscribe, go to:
+{{ quick_unsubscribe_url }}

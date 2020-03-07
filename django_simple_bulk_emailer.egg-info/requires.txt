@@ -1,0 +1,7 @@
+Django<3.0,>=2.2.9
+django-admin-sortable2>=0.6.21
+django-ckeditor>=5.6.1
+django-simple-file-handler>=0.2.2
+mailchimp3>=3.0
+Pillow>=5.0
+requests>=2.21.0

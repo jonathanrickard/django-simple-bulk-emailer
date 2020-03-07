@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}Email Subscriptions{% endblock %}
+
+{% block emailer_head %}
+    <link rel="stylesheet" type="text/css" href="{% static "django_simple_bulk_emailer/css/django_simple_bulk_emailer.css" %}">
+{% endblock %}
+
+{% block content %}
+
+    <div id="emailer_content">
+
+        <h1>
+            Email Subscriptions
+        </h1>
+
+        <p>
+            You have been unsubscribed from the {{ list_name }} email distribution list.
+        </p>
+        <p>
+            If you did not intend this, or if you wish to make additional changes, <a href="{{ manage_url }}">manage your subscriptions</a>.
+        </p>
+
+    </div>
+
+{% endblock %}

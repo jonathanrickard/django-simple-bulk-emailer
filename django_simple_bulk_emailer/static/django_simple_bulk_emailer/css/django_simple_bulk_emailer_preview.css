@@ -1,0 +1,9 @@
+@charset "UTF-8";
+
+
+#emailer_preview {
+    width: 100%;
+    background-color: #ededed;
+    margin: 0;
+    padding: 1em;
+}

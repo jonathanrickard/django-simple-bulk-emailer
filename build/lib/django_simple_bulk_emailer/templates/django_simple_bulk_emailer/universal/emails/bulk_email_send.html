@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+    <head>
+        {% block head_tags %}{% endblock %}
+    </head>
+
+    <body {% block body_tag %}{% endblock %}>
+
+        {% block content %}{% endblock %}
+
+        <img src="{{ protocol_domain }}{{ tracking_image }}" alt="image" style="width: 1px; height: 1px; padding: 0; margin: 0; border: 0;">
+
+    </body>
+
+</html>

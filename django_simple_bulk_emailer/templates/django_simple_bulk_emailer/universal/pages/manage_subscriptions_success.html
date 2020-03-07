@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}Manage Subscriptions{% endblock %}
+
+{% block emailer_head %}
+    <link rel="stylesheet" type="text/css" href="{% static "django_simple_bulk_emailer/css/django_simple_bulk_emailer.css" %}">
+{% endblock %}
+
+{% block content %}
+
+    <div id="emailer_content">
+
+        <h1>
+            Manage Subscriptions
+        </h1>
+
+        <p>
+            Thank you. Your changes have been saved.
+        </p>
+
+    </div>
+
+{% endblock %}

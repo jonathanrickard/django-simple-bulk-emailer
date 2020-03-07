@@ -1,0 +1,41 @@
+@charset "UTF-8";
+
+
+#emailer_table {
+    line-height: 1.5em;
+    font-size: 1em;
+    padding: 0;
+    margin: 0;
+    border: 0;
+}
+
+
+#emailer_table tr td {
+    margin: 0;
+    border: 0;
+}
+
+#emailer_table tr {
+    padding: 0;
+}
+
+#emailer_table td {
+    padding: 0.5em 1em 0.5em 1em;
+}
+
+#emailer_title_row {
+    font-weight: bold;
+    background-color: #ffffff;
+}
+
+#emailer_row_odd {
+    background-color: #ededed;
+}
+
+#emailer_row_even {
+    background-color: #ffffff;
+}
+
+#emailer_numerical {
+    text-align: right;
+}

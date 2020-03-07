@@ -1,0 +1,7 @@
+You can select your email subscriptions using the link below:
+
+{{ subscriptions_url }}
+
+Please note that this link will only allow you to make changes once. To update your subscriptions later, request a new link or use the link at the bottom of any subscription email.
+
+If you did not request this email, no action is necessary.

@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}Manage Subscriptions{% endblock %}
+
+{% block emailer_head %}
+    <link rel="stylesheet" type="text/css" href="{% static "django_simple_bulk_emailer/css/django_simple_bulk_emailer.css" %}">
+{% endblock %}
+
+{% block content %}
+
+    <div id="emailer_content">
+
+        <h1>
+            Manage Subscriptions
+        </h1>
+        <p>
+            The access link is invalid or has expired.
+        </p>
+        <p>
+            Please <a href="{{ subscribe_url }}">request a new link</a>.
+        </p>
+
+    </div>
+
+{% endblock %}
