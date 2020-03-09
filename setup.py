@@ -14,7 +14,7 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
     name='django_simple_bulk_emailer',
-    version='0.1.1',
+    version='0.1.2',
     packages=find_packages(),
     include_package_data=True,
     license='MIT License',
@@ -40,7 +40,7 @@ setup(
         'Django>=2.2.9,<3.0',
         'django-admin-sortable2>=0.6.21',
         'django-ckeditor>=5.6.1',
-        'django-simple-file-handler>=0.2.2',
+        'django-simple-file-handler>=0.2.3',
         'mailchimp3>=3.0',
         'Pillow>=5.0',
         'requests>=2.21.0',
