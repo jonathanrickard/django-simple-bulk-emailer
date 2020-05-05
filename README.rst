@@ -2,7 +2,7 @@
 django-simple-bulk-emailer
 ==========================
 
-The django-simple-file-handler Django app creates and distributes customizable bulk emails suitable for news articles and similar uses.
+The django-simple-bulk-emailer Django app creates and distributes customizable bulk emails suitable for news articles and similar uses.
 Optionally, it can produce customizable drop-in website article pages along with index pages for each subscription type.
 Article pages include social media Open Graph tags, with the ability to specify a default image for pages without an image assigned.
 The app can produce an unlimited number of subscriptions (email distribution lists), with different email and page templates for each.
