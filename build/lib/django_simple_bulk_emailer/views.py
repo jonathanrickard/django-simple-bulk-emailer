@@ -98,7 +98,7 @@ def send_email(email_content, list_slug='', subscriber_key='', subject='', text_
             'subscriber_key': subscriber_key,
         },
     )
-    if list_slug is not '':
+    if list_slug != '':
         unsubscribe_url = reverse(
             'django_simple_bulk_emailer:quick_unsubscribe',
             kwargs={

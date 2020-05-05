@@ -253,11 +253,11 @@ class SendBulkEmailTests(MixinWrap.BaseMixin):
                         )
                         list_one_emails_marked_send = 0
                         list_two_emails_marked_send = 0
-                        if state_one is 3 or state_one is 5 or state_one is 7:
+                        if state_one == 3 or state_one == 5 or state_one == 7:
                             list_one_emails_marked_send += 1
                         if state_one > 5:
                             list_one_emails_marked_send += 1
-                        if state_two is 3 or state_two is 5 or state_two is 7:
+                        if state_two == 3 or state_two == 5 or state_two == 7:
                             list_two_emails_marked_send += 1
                         if state_two > 5:
                             list_two_emails_marked_send += 1
@@ -296,13 +296,13 @@ class SendBulkEmailTests(MixinWrap.BaseMixin):
                         )
                         list_one_subscribers = 0
                         list_two_subscribers = 0
-                        if state_three is 2 or state_three is 4:
+                        if state_three == 2 or state_three == 4:
                             list_one_subscribers += 1
-                        if state_three is 3 or state_three is 4:
+                        if state_three == 3 or state_three == 4:
                             list_two_subscribers += 1
-                        if state_four is 2 or state_four is 4:
+                        if state_four == 2 or state_four == 4:
                             list_one_subscribers += 1
-                        if state_four is 3 or state_four is 4:
+                        if state_four == 3 or state_four == 4:
                             list_two_subscribers += 1
                         list_one_email_sent = list_one_emails_marked_send * list_one_subscribers
                         list_two_email_sent = list_two_emails_marked_send * list_two_subscribers

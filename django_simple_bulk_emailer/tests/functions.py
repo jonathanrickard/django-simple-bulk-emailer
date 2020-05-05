@@ -233,7 +233,7 @@ def create_request_response(self, get_post, page='1', time_dict=None):
         )
         if page != '1':
             reverse_string = '{}?page={}'.format(reverse_string, page)
-        if get_post is 'post':
+        if get_post == 'post':
             self.request = RequestFactory().post(
                 reverse_string,
                 self.data,
@@ -269,18 +269,18 @@ def create_subscriber_subscription_state(self, subscriber_email, first_name, las
     3: Exists with subscription two
     4: Exists with subscriptions one and two
     '''
-    if state is not 0:
+    if state != 0:
         subscriber = create_subscriber(
             subscriber_email=subscriber_email,
             first_name=first_name,
             last_name=last_name,
         )
-        if state is 2 or state is 4:
+        if state == 2 or state == 4:
             try:
                 subscriber.subscriptions.add(self.subscription_one)
             except AttributeError:
                 pass
-        if state is 3 or state is 4:
+        if state == 3 or state == 4:
             try:
                 subscriber.subscriptions.add(self.subscription_two)
             except AttributeError:
@@ -300,7 +300,7 @@ def create_subscription_email_state(self, list_name, state):
     6: 'exists with two emails, second sendable',
     7: 'exists with two emails, both sendable',
     '''
-    if state is not 0:
+    if state != 0:
         subscription = create_subscription(
             list_name=list_name,
         )
@@ -308,7 +308,7 @@ def create_subscription_email_state(self, list_name, state):
             self.subscription_one = subscription
         if list_name == self.list_two_name:
             self.subscription_two = subscription
-        if state is not 1:
+        if state != 1:
             email_one = create_email(
                 list_name=list_name,
             )
@@ -316,7 +316,7 @@ def create_subscription_email_state(self, list_name, state):
             email_two = create_email(
                 list_name=list_name,
             )
-        if state is 3 or state is 5 or state is 7:
+        if state == 3 or state == 5 or state == 7:
             email_one.sendable = True
             email_one.save()
         if state > 5:
@@ -876,7 +876,7 @@ def check_subscriber_subscription_state(self, subscriber_email, attributes, stat
     3: Exists with subscription two
     4: Exists with subscriptions one and two
     '''
-    if state is 0:
+    if state == 0:
         subscriber_exists(
             self,
             subscriber_email,
@@ -893,11 +893,11 @@ def check_subscriber_subscription_state(self, subscriber_email, attributes, stat
         subscription_one = str(self.subscription_one.pk)
         subscription_two = str(self.subscription_two.pk)
         subscription_choices = []
-        if state is 2 or state is 4:
+        if state == 2 or state == 4:
             subscription_choices += [
                 subscription_one,
             ]
-        if state is 3 or state is 4:
+        if state == 3 or state == 4:
             subscription_choices += [
                 subscription_two,
             ]
