@@ -16,6 +16,7 @@ django_simple_bulk_emailer.egg-info/SOURCES.txt
 django_simple_bulk_emailer.egg-info/dependency_links.txt
 django_simple_bulk_emailer.egg-info/requires.txt
 django_simple_bulk_emailer.egg-info/top_level.txt
+django_simple_bulk_emailer.egg-info/zip-safe
 django_simple_bulk_emailer/management/__init__.py
 django_simple_bulk_emailer/management/commands/__init__.py
 django_simple_bulk_emailer/management/commands/delete_expired_emails.py
