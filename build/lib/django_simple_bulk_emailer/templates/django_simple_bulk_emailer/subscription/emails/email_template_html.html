@@ -1,0 +1,167 @@
+{% extends basic_template %}
+
+{% load static %}
+
+{% block head_tags %}
+
+    <title>
+        {{ email_instance.email_subject }}
+    </title>
+
+    <style type="text/css">
+
+        body {
+            font-family: Helvetica, Arial, sans-serif;
+            font-size: 16px;
+            line-height: 24px;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 600;
+            line-height: 34px;
+            margin: 20px 0 18px 0;
+        }
+
+        h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 20px 0 -12px 0;
+        }
+
+        p {
+            font-size: 16px;
+            line-height: 24px;
+        }
+
+        ul, ol {
+            font-size: 16px;
+            line-height: 22px;
+        }
+
+        a {
+            color:#656565;
+            font-weight: normal;
+            text-decoration: underline;
+        }
+
+        strong {
+             font-weight: 600;
+        }
+
+        #content_container {
+            background-color: #ffffff;
+            width: 500px;
+            margin: 5px auto 5px auto;
+        }
+
+        #image_small {
+            width: 200px;
+            margin: 5px 0 30px 30px;
+        }
+
+        #image_big {
+            width: 500px;
+            margin: 0 0 20px 0;
+        }
+
+        #image_caption {
+            font-size: 14px;
+            margin: 8px 0 0 0;
+        }
+
+        #footer_container {
+            height: 190px;
+            width: 100%;
+            border-top: 1px solid #656565;
+            margin: 30px 0 0 0;
+            font-size: 12px;
+            line-height: 14px;
+            color: #656565;
+        }
+
+        #file_icon {
+            height: 12px;
+            width: 12px;
+            margin: 0 2px 0 25px;
+        }
+
+        #social_icon {
+             height: 32px;
+             width: 32px;
+             border: 0;
+        }
+
+    </style>
+
+{% endblock %}
+
+{% block content %}
+
+    <table width="500" align="center">
+        <tr>
+            <td>
+                <div id="content_container">
+
+                    <h1>
+                        {{ email_instance.headline }}
+                    </h1>
+
+                    {% if email_instance.email_image %}
+                        <table {% if email_instance.email_image.image_width == 200 %}width="200" align="right"{% else %}width="500" align="center"{% endif %}>
+                            <tr>
+                                <td>
+                                    <div id="{% if email_instance.email_image.image_width == 200 %}image_small{% else %}image_big{% endif %}">
+                                        <img src="{{ email_instance.media_domain }}{{ email_instance.email_image.image_url }}" width="{% if email_instance.email_image.image_width == 200 %}200{% else %}500{% endif %}" alt="{{ email_instance.email_image.description }}">
+                                        {% if email_instance.email_image.caption %}
+                                            <div id="image_caption">
+                                                {{ email_instance.email_image.caption }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    {% endif %}
+
+                    {{ email_instance.email_body|safe }}
+
+                    {% if email_instance.email_documents %}
+                        <p>
+                            <strong>
+                                Related documents
+                            </strong>
+                        </p>
+                        {% for document in email_instance.email_documents %}
+                            <p>
+                                <span id="file_icon">
+                                    <img src="{{ email_instance.static_domain }}{% static "django_simple_bulk_emailer/images/file_icon_12x12.png" %}" alt="File icon">
+                                </span>
+                                <a href="{{ email_instance.media_domain }}{{ document.file_url }}" target="_blank">{{ document.title }}</a>&nbsp;&nbsp;{{ document.extra_text }}
+                            </p>
+                        {% endfor %}
+                    {% endif %}
+
+                    <table width="500" align="center">
+                        <tr>
+                            <td>
+                                <div id="footer_container">
+                                    <p>
+                                        <a href="{{ protocol_domain }}{{ email_instance.page_url }}">View email in browser</a>
+                                    </p>
+                                    <p>
+                                        <a href="{{ subscriptions_url }}">Manage subscriptions</a> or <a href="{{ quick_unsubscribe_url }}">unsubscribe</a>
+                                    </p>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+
+                </div>
+            </td>
+        </tr>
+    </table>
+
+{% endblock %}

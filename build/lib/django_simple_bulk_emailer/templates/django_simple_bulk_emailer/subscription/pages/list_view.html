@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}{{ subscription.list_name }}{% endblock %}
+
+{% block emailer_head %}
+    <link rel="stylesheet" type="text/css" href="{% static "django_simple_bulk_emailer/css/django_simple_bulk_emailer.css" %}">
+{% endblock %}
+
+{% block content %}
+
+    <div id="emailer_content">
+
+        <h1>
+            {{ subscription.list_name }}
+        </h1>
+
+        <p>
+            To subscribe to {{ subscription.list_name|lower }}, visit the <a href="{{ subscribe_url }}">subscriptions page</a>.
+        </p>
+
+        {{ subscription.descriptive_text|safe }}
+
+        {% if email_set %}
+
+            <h2>
+                Recent {{ subscription.list_name|lower }}
+            </h2>
+
+            {% for email in email_set %}
+                <p>
+                    <a href="{{ email.page_url }}">{{ email.headline }}</a>
+                </p>
+                <div id="emailer_dateline">
+                    {{ email.publication_date|date:'l, N j, Y' }}
+                </div>
+            {% endfor %}
+
+            {% if email_set.has_previous or email_set.has_next %}
+                {% with this_page=email_set.number %}
+                    <br>
+                    <p>
+                        Pages:
+                        {% for page_number in email_set.paginator.page_range %}
+                            {% if forloop.counter != 1 %} | {% endif %}
+                            {% if page_number == this_page %}
+                                &nbsp;{{ page_number }}&nbsp;
+                            {% else %}
+                                &nbsp;<a href="?q={{ query }}&amp;page={{ page_number }}">{{ page_number }}</a>&nbsp;
+                            {% endif %}
+                        {% endfor %}
+                    </p>
+                {% endwith %}
+                <p>
+                    {% if email_set.has_previous %}
+                        <a href="?q={{ query }}&amp;page={{ email_set.previous_page_number }}"><button>&laquo; Previous page</button></a>
+                    {% endif %}
+                    {% if email_set.has_previous and email_set.has_next %}
+                        &nbsp;
+                    {% endif %}
+                    {% if email_set.has_next %}
+                        <a href="?q={{ query }}&amp;page={{ email_set.next_page_number }}"><button>Next page &raquo;</button></a>
+                    {% endif %}
+                </p>
+            {% endif %}
+
+        {% else %}
+            <p>
+                There are no {{ subscription.list_name|lower }} at this time.
+            </p>
+        {% endif %}
+
+    </div>
+
+{% endblock %}
