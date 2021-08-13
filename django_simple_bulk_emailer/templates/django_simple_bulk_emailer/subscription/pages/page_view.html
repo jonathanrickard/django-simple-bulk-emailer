@@ -67,7 +67,7 @@
             <br>
             {% for document in email_instance.email_documents %}
                 <p id="emailer_document">
-                    <img src="{% static "django_simple_bulk_emailer/images/file_icon_12x12.png" %}" alt="Document">
+                    <img class="file_icon" src="{% static "django_simple_bulk_emailer/images/file_icon_64x64.png" %}" alt="Document">
                     <a href="{{ document.file_url }}" target="_blank">{{ document.title }}</a>&nbsp;&nbsp;{{ document.extra_text }}
                 </p>
             {% endfor %}
@@ -77,6 +77,5 @@
 {% endblock %}
 
 {% block emailer_foot %}
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script type="text/javascript" src="{% static "django_simple_bulk_emailer/js/django_simple_bulk_emailer.js" %}"></script>
+    <script type="text/javascript" src="{% static "django_simple_bulk_emailer/js/django_simple_bulk_emailer.js" %}?052821"></script>
 {% endblock %}
