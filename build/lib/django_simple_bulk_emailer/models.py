@@ -22,6 +22,9 @@ from django.urls import (
 from django.utils import (
     timezone,
 )
+from django.utils.crypto import (
+    get_random_string,
+)
 from django.utils.formats import (
     localize,
 )
@@ -63,7 +66,7 @@ class SiteProfile(BaseMixin, Site):
         super().__init__(*args, **kwargs)
 
     protocol = models.CharField(
-        max_length=254,
+        max_length=255,
         default='https://',
     )
 
@@ -71,19 +74,23 @@ class SiteProfile(BaseMixin, Site):
         return '{}{}'.format(self.protocol, self.domain)
 
 
+def create_default_key():
+    return get_random_string(20)
+
+
 class Subscription(BaseMixin):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
     list_name = models.CharField(
-        max_length=254,
+        max_length=255,
     )
     descriptive_text = RichTextField(
         'descriptive text (if using page views)',
         blank=True,
     )
     list_slug = models.CharField(
-        max_length=254,
+        max_length=255,
         blank=True,
     )
     publicly_visible = models.BooleanField(
@@ -95,16 +102,16 @@ class Subscription(BaseMixin):
     )
     email_directory = models.CharField(
         'email template directory',
-        max_length=254,
+        max_length=255,
         default='django_simple_bulk_emailer/subscription/emails',
     )
     page_directory = models.CharField(
         'page template directory',
-        max_length=254,
+        max_length=255,
         default='django_simple_bulk_emailer/subscription/pages',
     )
     associated_model = models.CharField(
-        max_length=254,
+        max_length=255,
         default='django_simple_bulk_emailer.models.BulkEmail',
     )
     mc_sync = models.BooleanField(
@@ -113,18 +120,22 @@ class Subscription(BaseMixin):
     )
     mc_user = models.CharField(
         'MailChimp username',
-        max_length=254,
+        max_length=255,
         default='username',
     )
     mc_api = models.CharField(
         'MailChimp API key',
-        max_length=254,
+        max_length=255,
         default='API_key',
     )
     mc_list = models.CharField(
         'MailChimp audience ID',
-        max_length=254,
+        max_length=255,
         default='list_ID',
+    )
+    secret_key = models.CharField(
+        max_length=255,
+        default=create_default_key,
     )
     sort_order = models.PositiveIntegerField(
         'order',
@@ -166,6 +177,8 @@ class Subscription(BaseMixin):
 
     def save(self, *args, **kwargs):
         self.list_slug = slugify(self.list_name)
+        if not self.secret_key:
+            self.secret_key = get_random_string(20)
         super().save(*args, **kwargs)
 
     class Meta:
@@ -179,14 +192,14 @@ class Subscriber(BaseMixin):
         super().__init__(*args, **kwargs)
 
     subscriber_key = models.CharField(
-        max_length=254,
+        max_length=255,
     )
     first_name = models.CharField(
-        max_length=254,
+        max_length=255,
         default='Anonymous',
     )
     last_name = models.CharField(
-        max_length=254,
+        max_length=255,
         default='Subscriber',
     )
     subscriber_email = models.EmailField(
@@ -233,7 +246,7 @@ class BulkEmail(BaseMixin):
         null=True,
     )
     headline = models.CharField(
-        max_length=254,
+        max_length=255,
     )
     body_text = RichTextField(
     )
@@ -417,7 +430,7 @@ class EmailImage(ProcessedImage):
     )
     description = models.CharField(
         'screen reader description',
-        max_length=254,
+        max_length=255,
         default='Image',
     )
     caption = models.TextField(
@@ -465,10 +478,10 @@ class EmailTracker(BaseMixin):
         super().__init__(*args, **kwargs)
 
     subject = models.CharField(
-        max_length=254,
+        max_length=255,
     )
     subscription_name = models.CharField(
-        max_length=254,
+        max_length=255,
     )
     send_complete = models.DateTimeField(
         default=timezone.now,
@@ -476,8 +489,9 @@ class EmailTracker(BaseMixin):
     number_sent = models.PositiveIntegerField(
         default=0,
     )
-    json_data = models.TextField(
+    json_data = models.JSONField(
         blank=True,
+        null=True,
     )
 
     def send_complete_string(self):

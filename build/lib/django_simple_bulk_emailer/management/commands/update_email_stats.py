@@ -1,6 +1,3 @@
-import json
-
-
 from django.conf import (
     settings,
 )
@@ -42,8 +39,7 @@ class Command(BaseCommand):
                 if tracker not in monthly_stat.current_trackers.all() \
                         and tracker not in monthly_stat.older_trackers.all() \
                         and tracker.json_data:
-                    tracker_dict = json.loads(tracker.json_data)
-                    for key, value in tracker_dict.items():
+                    for key, value in tracker.json_data.items():
                         year = value[0]
                         month = value[1]
                         if year == current_datetime.year and month == current_datetime.month:
@@ -89,8 +85,7 @@ class Command(BaseCommand):
                 ''' Calculate tracker's opened number for current month '''
                 if tracker.json_data:
                     opens = 0
-                    tracker_dict = json.loads(tracker.json_data)
-                    for key, value in tracker_dict.items():
+                    for key, value in tracker.json_data.items():
                         year = value[0]
                         month = value[1]
                         if year == current_datetime.year and month == current_datetime.month:

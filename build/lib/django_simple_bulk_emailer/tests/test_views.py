@@ -6,7 +6,9 @@ from unittest.mock import (
 from django.test import (
     TestCase,
 )
-
+from django.urls import (
+    reverse,
+)
 
 from django_simple_bulk_emailer.views import (
     email_preview,
@@ -28,6 +30,7 @@ from .functions import (
     check_not_found,
     check_permission,
     check_quantity_email_sent,
+    compare_secret_keys,
     check_subscriber_attributes,
     check_subscriber_count,
     check_subscription_count,
@@ -43,6 +46,7 @@ from .functions import (
     create_subscriber_subscription_state,
     create_user,
     fake_now,
+    json_contains,
     subscriber_exists,
 )
 
@@ -1087,7 +1091,7 @@ class PagePreviewTests(PageViewPreviewBase):
 
 
 @patch(
-    'django_simple_bulk_emailer.views.timezone.now',
+    'django.utils.timezone.now',
     fake_now,
 )
 class OpenedEmailTests(MixinWrap.BaseMixin):
@@ -1110,11 +1114,12 @@ class OpenedEmailTests(MixinWrap.BaseMixin):
             'mode': 'RGBA',
             'format': 'PNG',
         }
-        self.test_json = '{{"{}": [{}, {}]}}'.format(
-            self.subscriber.subscriber_key,
-            self.current_year[0],
-            self.current_month[0],
-        )
+        self.test_json_dict = {
+            self.subscriber.subscriber_key: [
+                self.current_year[0],
+                self.current_month[0],
+            ]
+        }
         super().setUp()
 
     def test_get_invalid_pk(self):
@@ -1135,39 +1140,31 @@ class OpenedEmailTests(MixinWrap.BaseMixin):
         )
         check_http_response(
             self,
-            json=True,
-            true_strings=[
-                self.test_json,
-            ],
+            true_dict=self.test_json_dict,
             image_dict=self.image_dict,
         )
 
     def test_get_existing_data(self):
-        mock_json = '{"test_key": "Test value"}'
-        self.tracker.json_data = mock_json
+        mock_json_dict = {
+            'test_key': 'Test value',
+        }
+        self.tracker.json_data = mock_json_dict
         self.tracker.save()
         create_request_response(
             self,
             'get',
         )
-        merged_json = '{}, {}'.format(
-            mock_json[:-1],
-            self.test_json[1:],
-        )
+        merged_json_dict = {**mock_json_dict, **self.test_json_dict}
         check_http_response(
             self,
-            json=True,
-            true_strings=[
-                merged_json,
-            ],
-            false_strings=[
-                self.test_json,
-                mock_json,
-            ],
+            true_dict=merged_json_dict,
             image_dict=self.image_dict,
         )
 
 
+@patch(
+    'mailchimp3.MailChimp',
+)
 class MCSyncTests(MixinWrap.BaseMixin):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -1181,7 +1178,7 @@ class MCSyncTests(MixinWrap.BaseMixin):
         self.updated_email = 'updated@example.com'
         self.updated_first_name = 'UpdatedFirst'
         self.updated_last_name = 'UpdatedLast'
-        self.test_list_id = 'testaudienceid'
+        self.test_list_id = 'testlistid'
         self.subscription_one = create_subscription(
             list_name='List One',
             mc_sync=True,
@@ -1208,289 +1205,419 @@ class MCSyncTests(MixinWrap.BaseMixin):
             3: 'exists with subscription two',
             4: 'exists with subscriptions one and two',
         }
+        self.outgoing_json = ''
         super().setUp()
 
-    def test_post_subscribe(self):
-        self.data['type'] = 'subscribe'
-        state_comparisons = {
-            0: 2,
-            1: 2,
-            2: 2,
-            3: 4,
-            4: 4,
-        }
-        for start_state in state_comparisons.keys():
-            create_subscriber_subscription_state(
-                self,
-                self.original_email,
-                self.orignal_first_name,
-                self.orignal_last_name,
-                start_state,
-            )
-            create_request_response(
-                self,
-                'post',
-            )
-            extra_text = " — state tested was '{}'".format(
-                self.states_dict.get(
-                    start_state,
-                ),
-            )
-            check_subscriber_subscription_state(
-                self,
-                self.original_email,
-                self.subscriber_attributes,
-                state_comparisons.get(
-                    start_state,
-                ),
-                extra_text=extra_text,
-            )
-            remove_subscriber(self.original_email)
+    def create_url(self):
+        url_string = '{}{}{}?key={}'.format(
+            self.profile_instance.protocol,
+            self.profile_instance.domain,
+            reverse(
+                'django_simple_bulk_emailer:mc_sync',
+            ),
+            self.subscription_one.secret_key,
+        )
+        return url_string
 
-    def test_post_unsubscribe(self):
-        self.data['type'] = 'unsubscribe'
-        state_comparisons = {
-            0: 0,
-            1: 1,
-            2: 1,
-            3: 3,
-            4: 3,
+    def mock_all_webhooks(self, *args, **kwargs):
+        incoming_dict = {
+            'webhooks': [
+                {
+                    'url': self.create_url(),
+                    'id': 'webhook_ID',
+                },
+            ],
         }
-        for start_state in state_comparisons.keys():
-            create_subscriber_subscription_state(
-                self,
-                self.original_email,
-                self.orignal_first_name,
-                self.orignal_last_name,
-                start_state,
-            )
-            create_request_response(
-                self,
-                'post',
-            )
-            extra_text = " — state tested was '{}'".format(
-                self.states_dict.get(
-                    start_state,
-                ),
-            )
-            check_subscriber_subscription_state(
-                self,
-                self.original_email,
-                self.subscriber_attributes,
-                state_comparisons.get(
-                    start_state,
-                ),
-                extra_text=extra_text,
-            )
-            remove_subscriber(self.original_email)
+        return incoming_dict
 
-    def test_post_cleaned(self):
-        self.data = {
-            'type': 'cleaned',
-            'data[list_id]': self.test_list_id,
-            'data[email]': self.original_email,
-        }
-        state_comparisons = {
-            0: 0,
-            1: 1,
-            2: 1,
-            3: 3,
-            4: 3,
-        }
-        for start_state in state_comparisons.keys():
-            create_subscriber_subscription_state(
-                self,
-                self.original_email,
-                self.orignal_first_name,
-                self.orignal_last_name,
-                start_state,
-            )
-            create_request_response(
-                self,
-                'post',
-            )
-            extra_text = " — state tested was '{}'".format(
-                self.states_dict.get(
-                    start_state,
-                ),
-            )
-            check_subscriber_subscription_state(
-                self,
-                self.original_email,
-                self.subscriber_attributes,
-                state_comparisons.get(
-                    start_state,
-                ),
-                extra_text=extra_text,
-            )
-            remove_subscriber(self.original_email)
+    def mock_update_webhook(self, *args, **kwargs):
+        self.outgoing_json = kwargs
 
-    def test_post_update_email(self):
-        self.data = {
-            'type': 'upemail',
-            'data[list_id]': self.test_list_id,
-            'data[new_email]': self.updated_email,
-            'data[old_email]': self.original_email,
-        }
-        updated_subscriber_attributes = {
-            'mc_email': self.updated_email,
-        }
-        original_state_comparisons = {
-            0: 0,
-            1: 0,
-            2: 0,
-            3: 0,
-            4: 0,
-        }
-        combined_state_comparisons = {
-            0: {
-                0: 2,
-                1: 2,
-                2: 2,
-                3: 4,
-                4: 4,
-            },
-            1: {
-                0: 2,
-                1: 2,
-                2: 2,
-                3: 4,
-                4: 4,
-            },
-            2: {
-                0: 2,
-                1: 2,
-                2: 2,
-                3: 4,
-                4: 4,
-            },
-            3: {
-                0: 4,
-                1: 4,
-                2: 4,
-                3: 4,
-                4: 4,
-            },
-            4: {
-                0: 4,
-                1: 4,
-                2: 4,
-                3: 4,
-                4: 4,
-            },
-        }
-        for original_start_state in original_state_comparisons.keys():
-            updated_state_comparisons = combined_state_comparisons.get(
-                original_start_state,
-            )
-            for updated_start_state in updated_state_comparisons.keys():
-                create_subscriber_subscription_state(
-                    self,
-                    self.original_email,
-                    self.orignal_first_name,
-                    self.orignal_last_name,
-                    original_start_state,
-                )
-                create_subscriber_subscription_state(
-                    self,
-                    self.updated_email,
-                    self.orignal_first_name,
-                    self.orignal_last_name,
-                    updated_start_state,
+    def test_post_correct_key(self, MockMailChimp):
+        create_request_response(
+            self,
+            'post',
+            key=self.subscription_one.secret_key,
+        )
+        check_http_response(
+            self,
+            true_strings=[
+                'COMPLETED',
+            ],
+        )
+
+    def test_post_invalid_key(self, MockMailChimp):
+        create_request_response(
+            self,
+            'post',
+            key='incorrect_key',
+        )
+        check_http_response(
+            self,
+            true_strings=[
+                'INVALID CREDENTIALS',
+            ],
+        )
+
+    def test_post_no_key(self, MockMailChimp):
+        create_request_response(
+            self,
+            'post',
+        )
+        check_http_response(
+            self,
+            true_strings=[
+                'INVALID CREDENTIALS',
+            ],
+        )
+
+    def test_post_subscribe(self, MockMailChimp):
+        with patch.object(MockMailChimp().lists.webhooks, 'all', new=self.mock_all_webhooks):
+            with patch.object(MockMailChimp().lists.webhooks, 'update', new=self.mock_update_webhook):
+                self.data['type'] = 'subscribe'
+                state_comparisons = {
+                    0: 2,
+                    1: 2,
+                    2: 2,
+                    3: 4,
+                    4: 4,
+                }
+                for start_state in state_comparisons.keys():
+                    create_subscriber_subscription_state(
+                        self,
+                        self.original_email,
+                        self.orignal_first_name,
+                        self.orignal_last_name,
+                        start_state,
+                    )
+                    self.subscription_one.refresh_from_db()
+                    create_request_response(
+                        self,
+                        'post',
+                        key=self.subscription_one.secret_key,
+                    )
+                    extra_text = " — state tested was '{}'".format(
+                        self.states_dict.get(
+                            start_state,
+                        ),
+                    )
+                    check_subscriber_subscription_state(
+                        self,
+                        self.original_email,
+                        self.subscriber_attributes,
+                        state_comparisons.get(
+                            start_state,
+                        ),
+                        extra_text=extra_text,
+                    )
+                    remove_subscriber(self.original_email)
+
+    def test_post_unsubscribe(self, MockMailChimp):
+        with patch.object(MockMailChimp().lists.webhooks, 'all', new=self.mock_all_webhooks):
+            with patch.object(MockMailChimp().lists.webhooks, 'update', new=self.mock_update_webhook):
+                self.data['type'] = 'unsubscribe'
+                state_comparisons = {
+                    0: 0,
+                    1: 1,
+                    2: 1,
+                    3: 3,
+                    4: 3,
+                }
+                for start_state in state_comparisons.keys():
+                    create_subscriber_subscription_state(
+                        self,
+                        self.original_email,
+                        self.orignal_first_name,
+                        self.orignal_last_name,
+                        start_state,
+                    )
+                    self.subscription_one.refresh_from_db()
+                    create_request_response(
+                        self,
+                        'post',
+                        key=self.subscription_one.secret_key,
+                    )
+                    extra_text = " — state tested was '{}'".format(
+                        self.states_dict.get(
+                            start_state,
+                        ),
+                    )
+                    check_subscriber_subscription_state(
+                        self,
+                        self.original_email,
+                        self.subscriber_attributes,
+                        state_comparisons.get(
+                            start_state,
+                        ),
+                        extra_text=extra_text,
+                    )
+                    remove_subscriber(self.original_email)
+
+    def test_post_cleaned(self, MockMailChimp):
+        with patch.object(MockMailChimp().lists.webhooks, 'all', new=self.mock_all_webhooks):
+            with patch.object(MockMailChimp().lists.webhooks, 'update', new=self.mock_update_webhook):
+                self.data = {
+                    'type': 'cleaned',
+                    'data[list_id]': self.test_list_id,
+                    'data[email]': self.original_email,
+                }
+                state_comparisons = {
+                    0: 0,
+                    1: 1,
+                    2: 1,
+                    3: 3,
+                    4: 3,
+                }
+                for start_state in state_comparisons.keys():
+                    create_subscriber_subscription_state(
+                        self,
+                        self.original_email,
+                        self.orignal_first_name,
+                        self.orignal_last_name,
+                        start_state,
+                    )
+                    self.subscription_one.refresh_from_db()
+                    create_request_response(
+                        self,
+                        'post',
+                        key=self.subscription_one.secret_key,
+                    )
+                    extra_text = " — state tested was '{}'".format(
+                        self.states_dict.get(
+                            start_state,
+                        ),
+                    )
+                    check_subscriber_subscription_state(
+                        self,
+                        self.original_email,
+                        self.subscriber_attributes,
+                        state_comparisons.get(
+                            start_state,
+                        ),
+                        extra_text=extra_text,
+                    )
+                    remove_subscriber(self.original_email)
+
+    def test_post_update_email(self, MockMailChimp):
+        with patch.object(MockMailChimp().lists.webhooks, 'all', new=self.mock_all_webhooks):
+            with patch.object(MockMailChimp().lists.webhooks, 'update', new=self.mock_update_webhook):
+                self.data = {
+                    'type': 'upemail',
+                    'data[list_id]': self.test_list_id,
+                    'data[new_email]': self.updated_email,
+                    'data[old_email]': self.original_email,
+                }
+                updated_subscriber_attributes = {
+                    'mc_email': self.updated_email,
+                }
+                original_state_comparisons = {
+                    0: 0,
+                    1: 0,
+                    2: 0,
+                    3: 0,
+                    4: 0,
+                }
+                combined_state_comparisons = {
+                    0: {
+                        0: 2,
+                        1: 2,
+                        2: 2,
+                        3: 4,
+                        4: 4,
+                    },
+                    1: {
+                        0: 2,
+                        1: 2,
+                        2: 2,
+                        3: 4,
+                        4: 4,
+                    },
+                    2: {
+                        0: 2,
+                        1: 2,
+                        2: 2,
+                        3: 4,
+                        4: 4,
+                    },
+                    3: {
+                        0: 4,
+                        1: 4,
+                        2: 4,
+                        3: 4,
+                        4: 4,
+                    },
+                    4: {
+                        0: 4,
+                        1: 4,
+                        2: 4,
+                        3: 4,
+                        4: 4,
+                    },
+                }
+                for original_start_state in original_state_comparisons.keys():
+                    updated_state_comparisons = combined_state_comparisons.get(
+                        original_start_state,
+                    )
+                    for updated_start_state in updated_state_comparisons.keys():
+                        create_subscriber_subscription_state(
+                            self,
+                            self.original_email,
+                            self.orignal_first_name,
+                            self.orignal_last_name,
+                            original_start_state,
+                        )
+                        create_subscriber_subscription_state(
+                            self,
+                            self.updated_email,
+                            self.orignal_first_name,
+                            self.orignal_last_name,
+                            updated_start_state,
+                        )
+                        self.subscription_one.refresh_from_db()
+                        create_request_response(
+                            self,
+                            'post',
+                            key=self.subscription_one.secret_key,
+                        )
+                        extra_text = " — old state was '{}' and new state was '{}'".format(
+                            self.states_dict.get(
+                                original_start_state,
+                            ),
+                            self.states_dict.get(
+                                updated_start_state,
+                            ),
+                        )
+                        check_subscriber_subscription_state(
+                            self,
+                            self.original_email,
+                            self.subscriber_attributes,
+                            original_state_comparisons.get(
+                                original_start_state,
+                            ),
+                            extra_text=extra_text,
+                        )
+                        check_subscriber_subscription_state(
+                            self,
+                            self.updated_email,
+                            updated_subscriber_attributes,
+                            updated_state_comparisons.get(
+                                updated_start_state,
+                            ),
+                            extra_text=extra_text,
+                        )
+                        remove_subscriber(self.original_email)
+                        remove_subscriber(self.updated_email)
+
+    def test_post_update_profile_existing(self, MockMailChimp):
+        with patch.object(MockMailChimp().lists.webhooks, 'all', new=self.mock_all_webhooks):
+            with patch.object(MockMailChimp().lists.webhooks, 'update', new=self.mock_update_webhook):
+                self.data = {
+                    'type': 'profile',
+                    'data[list_id]': self.test_list_id,
+                    'data[email]': self.original_email,
+                    'data[merges][FNAME]': self.updated_first_name,
+                    'data[merges][LNAME]': self.updated_last_name,
+                }
+                updated_subscriber_attributes = {
+                    'first_name': self.updated_first_name,
+                    'last_name': self.updated_last_name,
+                    'subscription_choices': [str(self.subscription_one.pk)],
+                }
+                create_subscriber(
+                    subscriber_email=self.original_email,
+                    first_name=self.orignal_first_name,
+                    last_name=self.orignal_last_name,
                 )
                 create_request_response(
                     self,
                     'post',
+                    key=self.subscription_one.secret_key,
                 )
-                extra_text = " — old state was '{}' and new state was '{}'".format(
-                    self.states_dict.get(
-                        original_start_state,
-                    ),
-                    self.states_dict.get(
-                        updated_start_state,
-                    ),
-                )
-                check_subscriber_subscription_state(
+                check_subscriber_attributes(
                     self,
                     self.original_email,
-                    self.subscriber_attributes,
-                    original_state_comparisons.get(
-                        original_start_state,
-                    ),
-                    extra_text=extra_text,
-                )
-                check_subscriber_subscription_state(
-                    self,
-                    self.updated_email,
                     updated_subscriber_attributes,
-                    updated_state_comparisons.get(
-                        updated_start_state,
-                    ),
-                    extra_text=extra_text,
+                    True,
                 )
-                remove_subscriber(self.original_email)
-                remove_subscriber(self.updated_email)
 
-    def test_post_update_profile_existing(self):
-        self.data = {
-            'type': 'profile',
-            'data[list_id]': self.test_list_id,
-            'data[email]': self.original_email,
-            'data[merges][FNAME]': self.updated_first_name,
-            'data[merges][LNAME]': self.updated_last_name,
-        }
-        updated_subscriber_attributes = {
-            'first_name': self.updated_first_name,
-            'last_name': self.updated_last_name,
-            'subscription_choices': [str(self.subscription_one.pk)],
-        }
-        create_subscriber(
-            subscriber_email=self.original_email,
-            first_name=self.orignal_first_name,
-            last_name=self.orignal_last_name,
-        )
-        create_request_response(
-            self,
-            'post',
-        )
-        check_subscriber_attributes(
-            self,
-            self.original_email,
-            updated_subscriber_attributes,
-            True,
-        )
+    def test_post_update_profile_not_existing(self, MockMailChimp):
+        with patch.object(MockMailChimp().lists.webhooks, 'all', new=self.mock_all_webhooks):
+            with patch.object(MockMailChimp().lists.webhooks, 'update', new=self.mock_update_webhook):
+                self.data = {
+                    'type': 'profile',
+                    'data[list_id]': self.test_list_id,
+                    'data[email]': self.original_email,
+                    'data[merges][FNAME]': self.updated_first_name,
+                    'data[merges][LNAME]': self.updated_last_name,
+                }
+                updated_subscriber_attributes = {
+                    'first_name': self.updated_first_name,
+                    'last_name': self.updated_last_name,
+                    'subscription_choices': [str(self.subscription_one.pk)],
+                }
+                create_request_response(
+                    self,
+                    'post',
+                    key=self.subscription_one.secret_key,
+                )
+                check_subscriber_attributes(
+                    self,
+                    self.original_email,
+                    updated_subscriber_attributes,
+                    True,
+                )
 
-    def test_post_update_profile_not_existing(self):
-        self.data = {
-            'type': 'profile',
-            'data[list_id]': self.test_list_id,
-            'data[email]': self.original_email,
-            'data[merges][FNAME]': self.updated_first_name,
-            'data[merges][LNAME]': self.updated_last_name,
-        }
-        updated_subscriber_attributes = {
-            'first_name': self.updated_first_name,
-            'last_name': self.updated_last_name,
-            'subscription_choices': [str(self.subscription_one.pk)],
-        }
-        create_request_response(
-            self,
-            'post',
-        )
-        check_subscriber_attributes(
-            self,
-            self.original_email,
-            updated_subscriber_attributes,
-            True,
-        )
+    def test_local_key_updated(self, MockMailChimp):
+        with patch.object(MockMailChimp().lists.webhooks, 'all', new=self.mock_all_webhooks):
+            with patch.object(MockMailChimp().lists.webhooks, 'update', new=self.mock_update_webhook):
+                old_key = self.subscription_one.secret_key
+                self.data = {
+                    'type': 'profile',
+                    'data[list_id]': self.test_list_id,
+                    'data[email]': self.original_email,
+                    'data[merges][FNAME]': self.updated_first_name,
+                    'data[merges][LNAME]': self.updated_last_name,
+                }
+                create_request_response(
+                    self,
+                    'post',
+                    key=self.subscription_one.secret_key,
+                )
+                self.subscription_one.refresh_from_db()
+                new_key = self.subscription_one.secret_key
+                compare_secret_keys(
+                    self,
+                    old_key,
+                    new_key,
+                )
 
-    def test_get_redirect(self):
-        create_request_response(
-            self,
-            'get',
-        )
-        check_http_response(
-            self,
-            status_code=302,
-            redirect_url='/',
-        )
+    def test_outgoing_json(self, MockMailChimp):
+        with patch.object(MockMailChimp().lists.webhooks, 'all', new=self.mock_all_webhooks):
+            with patch.object(MockMailChimp().lists.webhooks, 'update', new=self.mock_update_webhook):
+                self.data = {
+                    'type': 'profile',
+                    'data[list_id]': self.test_list_id,
+                    'data[email]': self.original_email,
+                    'data[merges][FNAME]': self.updated_first_name,
+                    'data[merges][LNAME]': self.updated_last_name,
+                }
+                create_request_response(
+                    self,
+                    'post',
+                    key=self.subscription_one.secret_key,
+                )
+                self.subscription_one.refresh_from_db()
+                mock_data = {
+                    'list_id': 'testlistid',
+                    'webhook_id': 'webhook_ID',
+                    'data': {
+                        'url': '{}'.format(
+                            self.create_url(),
+                        )
+                    },
+                }
+                json_contains(
+                    self,
+                    json_data=self.outgoing_json,
+                    true_dict=mock_data,
+                )

@@ -100,6 +100,7 @@ class SubscriptionAdmin(SortableAdminMixin, BaseAdmin):
         super().__init__(*args, **kwargs)
         self.readonly_fields = [
             'subscriber_count',
+            'secret_key',
         ] + self.readonly_fields
         self.top_fieldsets = [
             (
@@ -120,6 +121,7 @@ class SubscriptionAdmin(SortableAdminMixin, BaseAdmin):
                         'mc_user',
                         'mc_api',
                         'mc_list',
+                        'secret_key',
                     ],
                     'classes': [
                         'collapse',
@@ -343,6 +345,11 @@ class BulkEmailAdminForm(forms.ModelForm):
             'send_history',
         ]
         widgets = {
+            'headline': forms.TextInput(
+                attrs={
+                    'size': '95',
+                },
+            ),
             'publication_date': admin.widgets.AdminDateWidget,
             'deletion_date': admin.widgets.AdminDateWidget,
         }
@@ -387,15 +394,6 @@ class BulkEmailAdmin(BaseAdmin):
             return super().get_form(request, obj, **kwargs)
         return BulkEmailAdminForm
 
-    formfield_overrides = {
-        models.CharField: {
-            'widget': forms.TextInput(
-                attrs={
-                    'size': '95',
-                },
-            ),
-        },
-    }
     inlines = [
         EmailImageInline,
         EmailDocumentInline,

@@ -61,7 +61,7 @@ urlpatterns = [
         name='opened_email',
     ),
     path(
-        'mc-sync/sync/',
+        'mc-sync/sync',
         mc_sync,
         name='mc_sync',
     ),

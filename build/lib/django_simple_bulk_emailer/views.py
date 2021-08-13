@@ -1,7 +1,6 @@
 from io import (
     BytesIO,
 )
-import json
 
 
 from django.conf import (
@@ -128,7 +127,12 @@ def send_email(email_content, list_slug='', subscriber_key='', subject='', text_
         reply_to=[reply_address],
     )
     message.attach_alternative(html_email, 'text/html')
-    message.send(fail_silently=False)
+    try:
+        message.send(
+            fail_silently=True,
+        )
+    except IOError:
+        pass
 
 
 def get_subscriptions(request):
@@ -315,7 +319,7 @@ def email_preview(request, list_slug, pk):
             email_instance = email_class.objects.get(
                 pk=pk,
             )
-        except ObjectDoesNotExist:
+        except (ObjectDoesNotExist, ValueError) as e:
             raise Http404()
         list_return = HttpResponseRedirect(reverse('admin:{}_{}_changelist'.format(
             email_instance._meta.app_label,
@@ -408,7 +412,7 @@ def page_view(request, list_slug, year, month, day, pk, headline_slug, preview=F
                 subscription_list=subscription,
                 pk=pk,
             )
-        except ObjectDoesNotExist:
+        except (ObjectDoesNotExist, ValueError) as e:
             raise Http404()
         if not preview and not email_instance.published:
             raise Http404()
@@ -449,23 +453,17 @@ def opened_email(request, pk, subscriber_key):
             pk=pk,
         )
         if email_tracker.json_data:
-            old_dict = json.loads(email_tracker.json_data)
+            dict_data = email_tracker.json_data
         else:
-            old_dict = {}
-        if subscriber_key not in old_dict:
-            new_dict = {
-                subscriber_key: [
-                    timezone.now().year,
-                    timezone.now().month,
-                ],
-            }
-            json_dump = json.dumps(new_dict)
-            if not email_tracker.json_data:
-                email_tracker.json_data = json_dump
-            else:
-                email_tracker.json_data = '{}, {}'.format(email_tracker.json_data[:-1], json_dump[1:])
+            dict_data = {}
+        if subscriber_key not in dict_data:
+            dict_data[subscriber_key] = [
+                timezone.now().year,
+                timezone.now().month,
+            ]
+            email_tracker.json_data = dict_data
             email_tracker.save()
-    except ObjectDoesNotExist:
+    except (ObjectDoesNotExist, ValueError) as e:
         pass
     temp_handle = BytesIO()
     image_file = Image.new(
@@ -528,10 +526,13 @@ def mc_sync(request):
             'data[list_id]',
             '',
         )
+        secret_key = request.GET.get('key', '')
         subscription = Subscription.objects.filter(
             mc_sync=True,
         ).filter(
             mc_list=mc_list,
+        ).filter(
+            secret_key=secret_key,
         ).first()
         if subscription:
             if request_type == 'upemail':
@@ -576,6 +577,58 @@ def mc_sync(request):
                         subscriber.last_name = last_name
                     subscriber.save()
                     subscriber.subscriptions.add(subscription)
+            secret_key_old = subscription.secret_key
+            subscription.secret_key = ''
+            subscription.save()
+            site = Site.objects.get(
+                id=settings.SITE_ID,
+            )
+            site_profile = SiteProfile.objects.filter(
+                domain=site.domain,
+            ).first()
+            base_url = reverse(
+                'django_simple_bulk_emailer:mc_sync',
+            )
+            url_old = '{}{}?key={}'.format(
+                site_profile.protocol_domain(),
+                base_url,
+                secret_key_old,
+            )
+            url_new = '{}{}?key={}'.format(
+                site_profile.protocol_domain(),
+                base_url,
+                subscription.secret_key,
+            )
+            try:
+                from mailchimp3 import (
+                    MailChimp,
+                )
+                from mailchimp3.mailchimpclient import (
+                    MailChimpError,
+                )
+                client = MailChimp(
+                    mc_api=subscription.mc_api,
+                    mc_user=subscription.mc_user,
+                )
+                try:
+                    webhooks = client.lists.webhooks.all(list_id=mc_list)['webhooks']
+                    for hook in webhooks:
+                        if hook['url'] == url_old:
+                            hook_id = hook['id']
+                            client.lists.webhooks.update(
+                                list_id=mc_list,
+                                webhook_id=hook_id,
+                                data={
+                                    'url': url_new,
+                                }
+                            )
+                            break
+                except MailChimpError:
+                    pass
+            except ImportError:
+                pass
+        else:
+            return HttpResponse('INVALID CREDENTIALS')
     except IntegrityError:
         pass
-    return HttpResponseRedirect('/')
+    return HttpResponse('COMPLETED')

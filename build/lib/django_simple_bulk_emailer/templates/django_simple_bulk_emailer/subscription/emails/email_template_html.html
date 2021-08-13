@@ -82,16 +82,10 @@
             color: #656565;
         }
 
-        #file_icon {
-            height: 12px;
-            width: 12px;
-            margin: 0 2px 0 25px;
-        }
-
-        #social_icon {
-             height: 32px;
-             width: 32px;
-             border: 0;
+        .file_icon {
+            height: 16px;
+            width: 16px;
+            margin: 0 5px 0 25px;
         }
 
     </style>
@@ -136,9 +130,7 @@
                         </p>
                         {% for document in email_instance.email_documents %}
                             <p>
-                                <span id="file_icon">
-                                    <img src="{{ email_instance.static_domain }}{% static "django_simple_bulk_emailer/images/file_icon_12x12.png" %}" alt="File icon">
-                                </span>
+                                <img class="file_icon" src="{{ email_instance.static_domain }}{% static 'django_simple_bulk_emailer/images/file_icon_64x64.png' %}" alt="File icon">
                                 <a href="{{ email_instance.media_domain }}{{ document.file_url }}" target="_blank">{{ document.title }}</a>&nbsp;&nbsp;{{ document.extra_text }}
                             </p>
                         {% endfor %}
