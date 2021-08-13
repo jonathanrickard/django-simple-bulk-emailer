@@ -186,7 +186,9 @@ def create_email(headline=None, list_name=None, body_text=None, published=False,
     return bulk_email
 
 
-def create_tracker(subject='Test email subject', subscription_name='Test subscription', send_complete=timezone.now(), number_sent=0, json_data=''):
+def create_tracker(subject='Test email subject', subscription_name='Test subscription', send_complete=timezone.now(), number_sent=0, json_data=None):
+    if json_data is None:
+        json_data = {}
     tracker = EmailTracker.objects.create(
         subject=subject,
         subscription_name=subscription_name,
@@ -222,7 +224,7 @@ def create_user(permission_list=None):
     return user
 
 
-def create_request_response(self, get_post, page='1', time_dict=None):
+def create_request_response(self, get_post, page='1', key='empty', time_dict=None):
     reverse_name = 'django_simple_bulk_emailer:{}'.format(self.view_name)
     with self.settings(
         SITE_ID=self.profile_instance.site_ptr.id,
@@ -232,7 +234,15 @@ def create_request_response(self, get_post, page='1', time_dict=None):
             kwargs=self.kwargs,
         )
         if page != '1':
-            reverse_string = '{}?page={}'.format(reverse_string, page)
+            reverse_string = '{}?page={}'.format(
+                reverse_string,
+                page,
+            )
+        if key != 'empty':
+            reverse_string = '{}?key={}'.format(
+                reverse_string,
+                key,
+            )
         if get_post == 'post':
             self.request = RequestFactory().post(
                 reverse_string,
@@ -329,9 +339,13 @@ def call_test_command(self):
         with self.settings(
                 SITE_ID=self.profile_instance.site_ptr.id,
         ):
-            call_command(self.test_command)
+            call_command(
+                self.test_command,
+            )
     except AttributeError:
-        call_command(self.test_command)
+        call_command(
+            self.test_command,
+        )
 
 
 def remove_subscriber(subscriber_email):
@@ -439,11 +453,33 @@ def email_exists(self, headline, boolean):
             headline=headline,
         )
     except ObjectDoesNotExist:
-        bulk_email = Subscriber.objects.none()
+        bulk_email = BulkEmail.objects.none()
     if boolean:
         self.assertTrue(bulk_email, error_msg_true)
     else:
         self.assertFalse(bulk_email, error_msg_false)
+
+
+def stats_exist(self, year_int, month_int, boolean):
+    error_msg_true = "Monthly stats with year '{}' and month '{}' do not exist".format(
+        str(year_int),
+        str(month_int),
+    )
+    error_msg_false = "Monthly stats with year '{}' and month '{}' should not exist".format(
+        str(year_int),
+        str(month_int),
+    )
+    try:
+        stats = MonthlyStat.objects.get(
+            year_int=year_int,
+            month_int=month_int,
+        )
+    except ObjectDoesNotExist:
+        stats = MonthlyStat.objects.none()
+    if boolean:
+        self.assertTrue(stats, error_msg_true)
+    else:
+        self.assertFalse(stats, error_msg_false)
 
 
 def subscriber_exists(self, subscriber_email, boolean, extra_text=''):
@@ -752,25 +788,42 @@ def html_contains(self, test_string, true_strings=None, false_strings=None):
         self.assertFalse(string in test_string, error_msg)
 
 
-def json_contains(self, true_strings=None, false_strings=None):
-    if true_strings is None:
-        true_strings = []
-    if false_strings is None:
-        false_strings = []
-    self.tracker.refresh_from_db()
-    data = self.tracker.json_data
-    for string in true_strings:
-        error_msg = "For view '{}', the JSON data did not contain '{}'".format(
+def json_contains(self, json_data=None, true_dict=None, false_dict=None):
+    if true_dict is None:
+        true_dict = {}
+    if false_dict is None:
+        false_dict = {}
+    if json_data is None:
+        self.tracker.refresh_from_db()
+        data = self.tracker.json_data
+    else:
+        data = json_data
+    for key, value in true_dict.items():
+        error_msg_key = "For view '{}', the JSON data did not contain the key '{}'".format(
             self.view_name,
-            string,
+            str(key),
         )
-        self.assertTrue(string in data, error_msg)
-    for string in false_strings:
-        error_msg = "For view '{}', the JSON data should not contain '{}'".format(
+        error_msg_value = "For view '{}', the JSON data value for key '{}' was '{}' and not '{}'".format(
             self.view_name,
-            string,
+            str(key),
+            str(data[key]),
+            str(value),
         )
-        self.assertFalse(string in data, error_msg)
+        self.assertIn(key, data.keys(), error_msg_key)
+        self.assertEqual(value, data[key], error_msg_value)
+
+    for key, value in false_dict.items():
+        error_msg_key = "For view '{}', the JSON data should not contain the key '{}'".format(
+            self.view_name,
+            str(key),
+        )
+        error_msg_value = "For view '{}', the JSON data value for key '{}' should not be '{}'".format(
+            self.view_name,
+            str(key),
+            str(value),
+        )
+        self.assertNotIn(key, data.keys(), error_msg_key)
+        self.assertFalse(value, data[key], error_msg_value)
 
 
 def image_contains(self, image_dict=None):
@@ -788,7 +841,7 @@ def image_contains(self, image_dict=None):
         self.assertIs(image_property, value, error_msg)
 
 
-def check_http_response(self, form_load=False, status_code=200, redirect_url=None, json=False, true_strings=None, false_strings=None, image_dict=None):
+def check_http_response(self, form_load=False, status_code=200, redirect_url=None, true_strings=None, false_strings=None, true_dict=None, false_dict=None, image_dict=None):
     status_code_equals(
         self,
         status_code,
@@ -804,19 +857,18 @@ def check_http_response(self, form_load=False, status_code=200, redirect_url=Non
         form_load,
     )
     if true_strings or false_strings:
-        if not json:
-            html_contains(
-                self,
-                self.response.content.decode(),
-                true_strings=true_strings,
-                false_strings=false_strings,
-            )
-        else:
-            json_contains(
-                self,
-                true_strings=true_strings,
-                false_strings=false_strings,
-            )
+        html_contains(
+            self,
+            self.response.content.decode(),
+            true_strings=true_strings,
+            false_strings=false_strings,
+        )
+    if true_dict or false_dict:
+        json_contains(
+            self,
+            true_dict=true_dict,
+            false_dict=false_dict,
+        )
     if image_dict:
         image_contains(
             self,
@@ -946,3 +998,8 @@ def check_field_in_form(self, key, boolean):
         self.assertTrue(key_present, error_msg_true)
     else:
         self.assertFalse(key_present, error_msg_false)
+
+
+def compare_secret_keys(self, secret_key_old, secret_key_new):
+    error_msg = 'The secret key was not changed'
+    self.assertNotEqual(secret_key_old, secret_key_new, error_msg)
