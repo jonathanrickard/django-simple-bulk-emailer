@@ -137,3 +137,8 @@
     font-size: 0.85em;
     word-break: normal;
 }
+
+.file_icon {
+    height: 1em;
+    margin-right: 5px;
+}
