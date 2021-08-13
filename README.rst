@@ -86,7 +86,7 @@ More information on MailChimp syncing is available below.
 
 **Advanced settings**
 
-These fields only need to be configured if the subscription needs to use custom templates or a custom subclass of the app's BulkEmail model.
+These fields only need to be configured if the subscription needs to use custom templates or a custom email model (for example, if you want to subclass the BulkEmail model multiple times and have separate subscriptions associated with each).
 Proceed with caution, as page views and email sending will not work correctly if these are not configured properly.
 
 * ``Email template directory`` — Defaults to 'django_simple_bulk_emailer/subscription/emails'. See the section on custom templates for more information.
@@ -160,7 +160,7 @@ Copying templates from the app and modifying them is the easiest way to create c
 The ``BulkEmail`` model is the basis of both bulk emails and article pages.
 It includes the following fields that may be useful in creating your own templates or accessing instances with your own code:
 
-* ``headline`` — ``CharField``, ``max_length`` of 254
+* ``headline`` — ``CharField``, ``max_length`` of 255
 * ``body_text`` — ``RichTextField`` (django-ckeditor HTML)
 * ``publication_date`` — ``DateField``
 * ``deletion_date`` — ``DateField``
@@ -184,7 +184,7 @@ Useful ``BulkEmail`` model methods include:
 
 Useful ``EmailImage`` fields include:
 
-* ``description`` — ``CharField``, ``max_length`` of 254
+* ``description`` — ``CharField``, ``max_length`` of 255
 * ``caption`` — ``TextField``
 * ``image_width`` — ``PositiveIntegerField``
 * ``processed_file`` — ``FileField``
@@ -257,7 +257,7 @@ Other MailChimp notes:
 
 **Configuring a Mailchimp webhook**
 
-The URL to use with the webhook will follow the format ``example.com/article-pages-path/mc-sync/sync/``.
+The URL to use with the webhook will follow the format ``https://www.example.com/article-pages-path/mc-sync/sync?key=secretkey`` where ``secretkey`` is the secret key listed in your subscription's MailChimp sync settings. Because MailChimp does not support other forms of authentication for webhooks, this key is used and changes after each request. MailChimp's webhook URL is then updated automatically.
 
 Check the boxes for what to sync:
 
@@ -285,6 +285,7 @@ Optional settings
 * ``EMAILER_SUBSTITUTIONS`` — Dictionary. If set, determines which substitutions will be made in the HTML of the emails' body text. A sample dictionary is available below.
 * ``EMAILER_EMAIL_DELETE_DAYS`` — Positive integer. If set, gives the deletion date field a default value this many days from the current date. Deletion date is only used if the management command is executed. Does not affect tracking of email opens.
 * ``EMAILER_TRACKING_MONTHS`` — Positive integer. Number of months for emails to be tracked for monthly stats. Defaults to 3. The higher this number is set, the longer the ``update_email_stats`` management command will take to run. Once removed from tracking, emails cannot be reinstated.
+* ``EMAILER_STATS_SAVED`` — Positive integer. Number of most-recent monthly stats to keep in the database if the ``delete_expired_stats`` management command is run. Defaults to 12.
 * ``EMAILER_PAGINATION`` — Boolean. If set to False, will stop list views from being paginated. Defaults to True.
 * ``EMAILER_PAGINATION_RESULTS`` — Positive integer. If set, determines the number of results per page in list view. Defaults to 10.
 * ``EMAILER_IMAGE_WIDTHS`` — A list of tuples. If set, will change the image width choices in the admin. Images will be scaled proportionally. The default widths list is given as an example below.
@@ -308,6 +309,7 @@ It is recommended that these commands be run by cron jobs or another method on a
 * ``sync_mailchimp`` — If MailChimp is configured, syncs local subscriber changes to MailChimp.
 * ``delete_unsubscribed_users`` — Optional command that removes subscribers who do not have any subscriptions and were created at least one day ago.
 * ``delete_expired_emails`` — Optional command that deletes emails which have reached or passed their deletion date.
+* ``delete_expired_stats`` — Optional command that deletes monthly stats which have reached or passed their deletion date.
 * ``update_email_stats`` — Optional command that updates the monthly statistics for email opens. It is suggested that this be run daily.
 
 ------------
