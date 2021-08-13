@@ -37,11 +37,11 @@ from .functions import (
     create_email,
     create_site,
     create_site_profile,
+    create_stats,
     create_subscriber,
     create_subscriber_subscription_state,
     create_subscription,
     create_subscription_email_state,
-    create_stats,
     create_tracker,
     email_exists,
     fake_now,
@@ -51,6 +51,7 @@ from .functions import (
     html_contains,
     remove_subscriber,
     remove_subscription_and_emails,
+    stats_exist,
     subscriber_exists,
 )
 
@@ -114,6 +115,72 @@ class DeleteExpiredEmailsTests(MixinWrap.BaseMixin):
                 headline_tomorrow,
                 True,
             )
+
+
+class DeleteExpiredStatsTests(MixinWrap.BaseMixin):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def setUp(self):
+        self.test_command = 'delete_expired_stats'
+        super().setUp()
+
+    def test_default(self):
+        with patch(
+            'django_simple_bulk_emailer.management.commands.delete_expired_stats.timezone.now',
+            fake_now,
+        ):
+            create_stats(
+                year_int=2019,
+                month_int=2,
+            )
+            create_stats(
+                year_int=2019,
+                month_int=1,
+            )
+            call_test_command(self)
+            stats_exist(
+                self,
+                2019,
+                2,
+                True,
+            )
+            stats_exist(
+                self,
+                2019,
+                1,
+                False,
+            )
+
+    def test_setting(self):
+        with patch(
+            'django_simple_bulk_emailer.management.commands.delete_expired_stats.timezone.now',
+            fake_now,
+        ):
+            with self.settings(
+                    EMAILER_STATS_SAVED=6,
+            ):
+                create_stats(
+                    year_int=2019,
+                    month_int=8,
+                )
+                create_stats(
+                    year_int=2019,
+                    month_int=7,
+                )
+                call_test_command(self)
+                stats_exist(
+                    self,
+                    2019,
+                    8,
+                    True,
+                )
+                stats_exist(
+                    self,
+                    2019,
+                    7,
+                    False,
+                )
 
 
 class DeleteUnsubscribedUsersTests(MixinWrap.BaseMixin):
@@ -535,7 +602,7 @@ class SendBulkEmailTests(MixinWrap.BaseMixin):
 
 
 @patch(
-    'django_simple_bulk_emailer.management.commands.sync_mailchimp.MailChimp',
+    'mailchimp3.MailChimp',
 )
 class SyncMailChimpTests(MixinWrap.BaseMixin):
     def __init__(self, *args, **kwargs):
@@ -706,7 +773,7 @@ class SyncMailChimpTests(MixinWrap.BaseMixin):
                 self,
                 subscriber=self.subscriber_one,
             )
-    
+
     def test_updated_subscriber_with_error(self, MockMailChimp):
         with patch.object(MockMailChimp().lists.members, 'create_or_update', new=self.mock_create_or_update):
             self.subscriber_one.first_name = 'Updated'
@@ -811,13 +878,14 @@ class SyncMailChimpTests(MixinWrap.BaseMixin):
                 subscriber=self.subscriber_two,
             )
 
+
 '''
 Testing for MailChimp does not check every combination of subscription and subscriber but covers most scenarios.
 '''
 
 
 @patch(
-    'django_simple_bulk_emailer.management.commands.update_email_stats.timezone.now',
+    'django.utils.timezone.now',
     fake_now,
 )
 class UpdateEmailStatsTests(MixinWrap.BaseMixin):
@@ -910,7 +978,9 @@ class UpdateEmailStatsTests(MixinWrap.BaseMixin):
                 year=2020,
                 month=1,
             ),
-            json_data='{"test_key": [2020, 1]}',
+            json_data={
+                'test_key': [2020, 1],
+            },
         )
         older_subject = 'Older tracker subject'
         create_tracker(
@@ -919,7 +989,9 @@ class UpdateEmailStatsTests(MixinWrap.BaseMixin):
                 year=2019,
                 month=12,
             ),
-            json_data='{"test_key": [2020, 1]}',
+            json_data={
+                'test_key': [2020, 1],
+            },
         )
         irrelevant_subject = 'Irrelevant tracker subject'
         create_tracker(
@@ -928,7 +1000,9 @@ class UpdateEmailStatsTests(MixinWrap.BaseMixin):
                 year=2020,
                 month=1,
             ),
-            json_data='{"test_key": [2019, 12]}',
+            json_data={
+                'test_key': [2019, 12],
+            },
         )
         call_test_command(self)
         self.test_instance = get_monthly_stat(
@@ -962,7 +1036,9 @@ class UpdateEmailStatsTests(MixinWrap.BaseMixin):
                 year=2020,
                 month=1,
             ),
-            json_data='{"test_key": [2020, 1]}',
+            json_data={
+                'test_key': [2020, 1],
+            },
         )
         create_tracker(
             subscription_name=self.list_one_name,
@@ -970,7 +1046,9 @@ class UpdateEmailStatsTests(MixinWrap.BaseMixin):
                 year=2020,
                 month=1,
             ),
-            json_data='{"test_key": [2020, 1]}',
+            json_data={
+                'test_key': [2020, 1],
+            },
         )
         create_tracker(
             subscription_name=self.list_two_name,
@@ -978,7 +1056,9 @@ class UpdateEmailStatsTests(MixinWrap.BaseMixin):
                 year=2020,
                 month=1,
             ),
-            json_data='{"test_key": [2020, 1]}',
+            json_data={
+                'test_key': [2020, 1],
+            },
         )
         create_tracker(
             subscription_name=self.list_two_name,
@@ -986,7 +1066,9 @@ class UpdateEmailStatsTests(MixinWrap.BaseMixin):
                 year=2020,
                 month=1,
             ),
-            json_data='{"test_key": [2020, 1]}',
+            json_data={
+                'test_key': [2020, 1],
+            },
         )
         call_test_command(self)
         self.test_instance = get_monthly_stat(
@@ -1025,7 +1107,9 @@ class UpdateEmailStatsTests(MixinWrap.BaseMixin):
                 year=2020,
                 month=1,
             ),
-            json_data='{"test_key": [2020, 1]}',
+            json_data={
+                'test_key': [2020, 1],
+            },
         )
         create_tracker(
             subscription_name=test_list_two_name,
@@ -1033,14 +1117,18 @@ class UpdateEmailStatsTests(MixinWrap.BaseMixin):
                 year=2020,
                 month=1,
             ),
-            json_data='{"test_key": [2020, 1]}',
+            json_data={
+                'test_key': [2020, 1],
+            },
         )
         create_tracker(
             send_complete=fake_now(
                 year=2019,
                 month=12,
             ),
-            json_data='{"test_key": [2020, 1]}',
+            json_data={
+                'test_key': [2020, 1],
+            },
         )
         call_test_command(self)
         self.test_instance = get_monthly_stat(
@@ -1080,7 +1168,9 @@ class UpdateEmailStatsTests(MixinWrap.BaseMixin):
                 month=1,
             ),
             number_sent=2,
-            json_data='{"test_key": [2020, 1]}',
+            json_data={
+                'test_key': [2020, 1],
+            },
         )
         current_subject_two = 'Current test email two'
         create_tracker(
@@ -1091,7 +1181,11 @@ class UpdateEmailStatsTests(MixinWrap.BaseMixin):
                 month=1,
             ),
             number_sent=4,
-            json_data='{"test_key_one": [2020, 1], "test_key_two": [2020, 1], "test_key_three": [2020, 1]}',
+            json_data={
+                'test_key_one': [2020, 1],
+                'test_key_two': [2020, 1],
+                'test_key_three': [2020, 1],
+            },
         )
         older_subject_one = 'Older test email one'
         create_tracker(
@@ -1102,7 +1196,9 @@ class UpdateEmailStatsTests(MixinWrap.BaseMixin):
                 month=11,
             ),
             number_sent=4,
-            json_data='{"test_key": [2020, 1]}',
+            json_data={
+                'test_key': [2020, 1],
+            },
         )
         older_subject_two = 'Older test email two'
         create_tracker(
@@ -1113,7 +1209,11 @@ class UpdateEmailStatsTests(MixinWrap.BaseMixin):
                 month=12,
             ),
             number_sent=3,
-            json_data='{"test_key_one": [2020, 1], "test_key_two": [2020, 1], "test_key_three": [2020, 1]}',
+            json_data={
+                'test_key_one': [2020, 1],
+                'test_key_two': [2020, 1],
+                'test_key_three': [2020, 1],
+            },
         )
         call_test_command(self)
         self.test_instance = get_monthly_stat(
