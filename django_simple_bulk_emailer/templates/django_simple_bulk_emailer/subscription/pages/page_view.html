@@ -6,7 +6,7 @@
 
 {% block emailer_head %}
 
-    <link rel="stylesheet" type="text/css" href="{% static "django_simple_bulk_emailer/css/django_simple_bulk_emailer.css" %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'django_simple_bulk_emailer/css/django_simple_bulk_emailer.css' %}">
     <meta property="og:url" content="{{ request.build_absolute_uri }}">
     <meta property="og:type" content="article">
     <meta property="og:description" content="{{ email_instance.first_paragraph }}">
@@ -67,7 +67,7 @@
             <br>
             {% for document in email_instance.email_documents %}
                 <p id="emailer_document">
-                    <img class="file_icon" src="{% static "django_simple_bulk_emailer/images/file_icon_64x64.png" %}" alt="Document">
+                    <img class="file_icon" src="{% static 'django_simple_bulk_emailer/images/file_icon_64x64.png' %}" alt="Document">
                     <a href="{{ document.file_url }}" target="_blank">{{ document.title }}</a>&nbsp;&nbsp;{{ document.extra_text }}
                 </p>
             {% endfor %}
@@ -77,5 +77,5 @@
 {% endblock %}
 
 {% block emailer_foot %}
-    <script type="text/javascript" src="{% static "django_simple_bulk_emailer/js/django_simple_bulk_emailer.js" %}?052821"></script>
+    <script type="text/javascript" src="{% static 'django_simple_bulk_emailer/js/django_simple_bulk_emailer.js' %}?052821"></script>
 {% endblock %}
