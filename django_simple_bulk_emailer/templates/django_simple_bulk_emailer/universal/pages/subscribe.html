@@ -5,7 +5,7 @@
 {% block title %}Email Subscriptions{% endblock %}
 
 {% block emailer_head %}
-    <link rel="stylesheet" type="text/css" href="{% static "django_simple_bulk_emailer/css/django_simple_bulk_emailer.css" %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'django_simple_bulk_emailer/css/django_simple_bulk_emailer.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -44,10 +44,10 @@
                 Email address:
                 <br>
                 <input type="text" id="emailer_hp_input" name="email" value="{% if form.email.value %}{{ form.email.value }}{% endif %}">
-                <input type="text" id="emailer_input" name="subscriber_email" value="{% if form.subscriber_email.value %}{{ form.subscriber_email.value }}{% endif %}">
+                <input type="text" class="emailer_input" name="subscriber_email" value="{% if form.subscriber_email.value %}{{ form.subscriber_email.value }}{% endif %}">
                 {% if form.subscriber_email.errors %}
                     <br>
-                    <span id="emailer_error">
+                    <span class="emailer_error">
                         Please enter a valid email address
                     </span>
                 {% endif %}
