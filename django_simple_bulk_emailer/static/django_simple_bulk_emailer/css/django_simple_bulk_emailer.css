@@ -10,21 +10,30 @@
 }
 
 #emailer_content h1 {
-    font-size: 1.5em;
+    font-size: 2em;
     font-weight: 500;
-    margin: 0.75em 0 0.75em 0;
+    color: #000000;
+    margin: 0.5em 0 0 0;
 }
 
 #emailer_content h2 {
-    font-size: 1.25em;
+    font-size: 1.5em;
     font-weight: 500;
-    margin: 1.25em 0 0.75em 0;
+    color: #000000;
+    margin: 0.75em 0 -0.4em 0;
 }
 
 #emailer_content h3 {
-    font-size: 1em;
     font-weight: 600;
+    color: #000000;
     margin: 1.25em 0 -0.75em 0;
+}
+
+#emailer_content h4 {
+    font-size: 1.4em;
+    font-weight: 400;
+    color: #000000;
+    margin: 0.5em 0 0.6em 0;
 }
 
 #emailer_content p {
@@ -93,7 +102,7 @@
 
 #emailer_dateline {
     font-size: 0.75em;
-    margin: -1.1em 0 0 0;
+    margin: 0 0 2em 0;
 }
 
 #emailer_document {
@@ -120,7 +129,7 @@
     float: right;
     width: 100%;
     max-width: 400px;
-    margin: 1.2em 0 2em 2em;
+    margin: 0 0 2em 2em;
 }
 
 .emailer_image.small {
