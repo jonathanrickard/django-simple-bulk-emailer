@@ -350,6 +350,18 @@ class BulkEmailAdminForm(forms.ModelForm):
                     'size': '95',
                 },
             ),
+            'secondary_headline': forms.Textarea(
+                attrs={
+                    'rows': 3,
+                    'cols': 95,
+                },
+            ),
+            'update_text': forms.Textarea(
+                attrs={
+                    'rows': 3,
+                    'cols': 95,
+                },
+            ),
             'publication_date': admin.widgets.AdminDateWidget,
             'deletion_date': admin.widgets.AdminDateWidget,
         }
@@ -370,6 +382,8 @@ class BulkEmailAdmin(BaseAdmin):
                     'fields': [
                         'subscription_list',
                         'headline',
+                        'secondary_headline',
+                        'update_text',
                         'body_text',
                     ]
                 }
@@ -380,7 +394,6 @@ class BulkEmailAdmin(BaseAdmin):
                  None, {
                      'fields': [
                          'published',
-                         'is_updated',
                          'publication_date',
                          'deletion_date',
                      ]

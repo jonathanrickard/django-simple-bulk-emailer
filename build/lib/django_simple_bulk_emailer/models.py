@@ -250,19 +250,24 @@ class BulkEmail(BaseMixin):
     )
     body_text = RichTextField(
     )
+    secondary_headline = models.TextField(
+        'secondary headline (optional)',
+        blank=True,
+    )
+    update_text = models.TextField(
+        'updates (optional)',
+        blank=True,
+    )
     publication_date = models.DateField(
         default=timezone.localdate,
     )
     deletion_date = models.DateField(
+        'deletion date (optional)',
         default=get_deletion_date,
         blank=True,
         null=True,
     )
     published = models.BooleanField(
-        default=False,
-    )
-    is_updated = models.BooleanField(
-        'has been updated',
         default=False,
     )
     sendable = models.BooleanField(
@@ -293,7 +298,7 @@ class BulkEmail(BaseMixin):
         return strip_tags(self.body_text.split('>', 1)[1].split('</p>', 1)[0])
 
     def email_subject(self):
-        if self.is_updated:
+        if self.update_text:
             return 'Updated: {}'.format(self.headline)
         else:
             return self.headline

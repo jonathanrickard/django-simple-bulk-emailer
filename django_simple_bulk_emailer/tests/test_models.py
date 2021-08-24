@@ -218,7 +218,7 @@ class BulkEmailTests(MixinWrap.BaseMixin):
         )
 
     def test_email_subject_updated(self):
-        self.test_instance.is_updated = True
+        self.test_instance.update_text = 'Test update'
         self.test_instance.save()
         method_output_equals(
             self,

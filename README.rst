@@ -161,11 +161,12 @@ The ``BulkEmail`` model is the basis of both bulk emails and article pages.
 It includes the following fields that may be useful in creating your own templates or accessing instances with your own code:
 
 * ``headline`` — ``CharField``, ``max_length`` of 255
+* ``secondary_headline`` — ``TextField``
+* ``update_text`` — ``TextField``
 * ``body_text`` — ``RichTextField`` (django-ckeditor HTML)
 * ``publication_date`` — ``DateField``
 * ``deletion_date`` — ``DateField``
 * ``published`` — ``BooleanField``
-* ``is_updated`` — ``BooleanField``
 
 Useful ``BulkEmail`` model methods include:
 
