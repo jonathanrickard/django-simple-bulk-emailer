@@ -28,6 +28,7 @@ django_simple_bulk_emailer/management/commands/sync_mailchimp.py
 django_simple_bulk_emailer/management/commands/update_email_stats.py
 django_simple_bulk_emailer/migrations/0001_initial.py
 django_simple_bulk_emailer/migrations/0002_auto_20210812_1535.py
+django_simple_bulk_emailer/migrations/0003_auto_20210824_1148.py
 django_simple_bulk_emailer/migrations/__init__.py
 django_simple_bulk_emailer/signals/__init__.py
 django_simple_bulk_emailer/signals/handlers.py

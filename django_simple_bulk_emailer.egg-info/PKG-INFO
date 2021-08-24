@@ -1,6 +1,6 @@
 Metadata-Version: 1.1
 Name: django-simple-bulk-emailer
-Version: 0.1.6
+Version: 0.1.7
 Summary: A Django app for sending bulk email
 Home-page: https://github.com/jonathanrickard/django-simple-bulk-emailer
 Author: Jonathan Rickard
@@ -169,11 +169,12 @@ Description: ==========================
         It includes the following fields that may be useful in creating your own templates or accessing instances with your own code:
         
         * ``headline`` — ``CharField``, ``max_length`` of 255
+        * ``secondary_headline`` — ``TextField``
+        * ``update_text`` — ``TextField``
         * ``body_text`` — ``RichTextField`` (django-ckeditor HTML)
         * ``publication_date`` — ``DateField``
         * ``deletion_date`` — ``DateField``
         * ``published`` — ``BooleanField``
-        * ``is_updated`` — ``BooleanField``
         
         Useful ``BulkEmail`` model methods include:
         
