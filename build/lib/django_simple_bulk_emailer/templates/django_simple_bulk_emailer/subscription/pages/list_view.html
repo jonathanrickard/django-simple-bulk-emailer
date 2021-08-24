@@ -24,14 +24,18 @@
 
         {% if email_set %}
 
+            <br>
+
             <h2>
                 Recent {{ subscription.list_name|lower }}
             </h2>
 
+            <br>
+
             {% for email in email_set %}
-                <p>
+                <h4>
                     <a href="{{ email.page_url }}">{{ email.headline }}</a>
-                </p>
+                </h4>
                 <div id="emailer_dateline">
                     {{ email.publication_date|date:'l, N j, Y' }}
                 </div>
