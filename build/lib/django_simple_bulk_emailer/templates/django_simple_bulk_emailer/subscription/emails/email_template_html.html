@@ -2,43 +2,25 @@
 
 {% load static %}
 
+
 {% block head_tags %}
 
     <title>
         {{ email_instance.email_subject }}
     </title>
 
-    <style type="text/css">
+    <style>
 
         body {
             font-family: Helvetica, Arial, sans-serif;
-            font-size: 16px;
-            line-height: 24px;
-            margin: 0;
             padding: 0;
+            margin: 0;
+            color: #000000;
         }
 
-        h1 {
-            font-size: 24px;
-            font-weight: 600;
-            line-height: 34px;
-            margin: 20px 0 18px 0;
-        }
-
-        h3 {
-            font-size: 16px;
-            font-weight: 600;
-            margin: 20px 0 -12px 0;
-        }
-
-        p {
+        p, ul, ol {
             font-size: 16px;
             line-height: 24px;
-        }
-
-        ul, ol {
-            font-size: 16px;
-            line-height: 22px;
         }
 
         a {
@@ -51,107 +33,124 @@
              font-weight: 600;
         }
 
-        #content_container {
-            background-color: #ffffff;
-            width: 500px;
-            margin: 5px auto 5px auto;
+        h1 {
+            font-size: 26px;
+            line-height: 34px;
+            font-weight: 600;
         }
 
-        #image_small {
-            width: 200px;
-            margin: 5px 0 30px 30px;
+        h1 a, h1 a:visited {
+            font-weight: 600;
         }
 
-        #image_big {
-            width: 500px;
-            margin: 0 0 20px 0;
+        h2 {
+            font-size: 20px;
+            font-weight: 400;
+            margin: -6px 0 16px 0;
         }
 
-        #image_caption {
-            font-size: 14px;
-            margin: 8px 0 0 0;
+        h2 a, h2 a:visited {
+            font-weight: 400;
         }
 
-        #footer_container {
-            height: 190px;
-            width: 100%;
-            border-top: 1px solid #656565;
-            margin: 30px 0 0 0;
-            font-size: 12px;
-            line-height: 14px;
-            color: #656565;
+        h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 20px 0 -12px 0;
         }
 
-        .file_icon {
-            height: 16px;
-            width: 16px;
-            margin: 0 5px 0 25px;
+        h3 a, h3 a:visited {
+            font-weight: 600;
         }
 
     </style>
 
 {% endblock %}
 
+
 {% block content %}
 
-    <table width="500" align="center">
+    <table role="presentation" width="600" align="center">
         <tr>
             <td>
-                <div id="content_container">
 
-                    <h1>
-                        {{ email_instance.headline }}
-                    </h1>
+                <div style="margin: 0 5px 0 5px;">
 
-                    {% if email_instance.email_image %}
-                        <table {% if email_instance.email_image.image_width == 200 %}width="200" align="right"{% else %}width="500" align="center"{% endif %}>
-                            <tr>
-                                <td>
-                                    <div id="{% if email_instance.email_image.image_width == 200 %}image_small{% else %}image_big{% endif %}">
-                                        <img src="{{ email_instance.media_domain }}{{ email_instance.email_image.image_url }}" width="{% if email_instance.email_image.image_width == 200 %}200{% else %}500{% endif %}" alt="{{ email_instance.email_image.description }}">
-                                        {% if email_instance.email_image.caption %}
-                                            <div id="image_caption">
-                                                {{ email_instance.email_image.caption }}
-                                            </div>
-                                        {% endif %}
-                                    </div>
-                                </td>
-                            </tr>
-                        </table>
-                    {% endif %}
+                    <div style="border-bottom: 1px solid #656565;">
 
-                    {{ email_instance.email_body|safe }}
+                        <h1>
+                            {{ email_instance.headline }}
+                        </h1>
 
-                    {% if email_instance.email_documents %}
-                        <p>
-                            <strong>
-                                Related documents
-                            </strong>
-                        </p>
-                        {% for document in email_instance.email_documents %}
+                        {% if email_instance.secondary_headline %}
+                            <h2>
+                                <em>
+                                    {{ email_instance.secondary_headline }}
+                                </em>
+                            </h2>
+                        {% endif %}
+
+                        {% if email_instance.email_image %}
+                            <table {% if email_instance.email_image.image_width == 200 %}width="200" align="right"{% else %}width="590" align="center"{% endif %}>
+                                <tr>
+                                    <td>
+                                        <div {% if email_instance.email_image.image_width == 200 %}style="margin: 5px 0 30px 30px;"{% else %}style="margin: 0 0 20px 0;"{% endif %}">
+                                            <img alt="{{ email_instance.email_image.description }}" src="{{ email_instance.media_domain }}{{ email_instance.email_image.image_url }}" width="{% if email_instance.email_image.image_width == 200 %}200{% else %}590{% endif %}">
+                                            {% if email_instance.email_image.caption %}
+                                                <div>
+                                                    <p>
+                                                        {{ email_instance.email_image.caption }}
+                                                    </p>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        {% endif %}
+
+                        {% if email_instance.update_text %}
                             <p>
-                                <img class="file_icon" src="{{ email_instance.static_domain }}{% static 'django_simple_bulk_emailer/images/file_icon_64x64.png' %}" alt="File icon">
-                                <a href="{{ email_instance.media_domain }}{{ document.file_url }}" target="_blank">{{ document.title }}</a>&nbsp;&nbsp;{{ document.extra_text }}
+                                <em>
+                                    <strong>Updated at {{ email_instance.updated.time }} on {{ email_instance.updated|date:"N j, Y" }}:</strong> {{ email_instance.update_text }}
+                                </em>
                             </p>
-                        {% endfor %}
-                    {% endif %}
+                        {% endif %}
 
-                    <table width="500" align="center">
-                        <tr>
-                            <td>
-                                <div id="footer_container">
-                                    <p>
-                                        <a href="{{ protocol_domain }}{{ email_instance.page_url }}">View email in browser</a>
-                                    </p>
-                                    <p>
-                                        <a href="{{ subscriptions_url }}">Manage subscriptions</a> or <a href="{{ quick_unsubscribe_url }}">unsubscribe</a>
-                                    </p>
-                                </div>
-                            </td>
-                        </tr>
-                    </table>
+                        {{ email_instance.email_body|safe }}
+
+                        {% if email_instance.email_documents %}
+                            <p>
+                                <strong>
+                                    Related documents
+                                </strong>
+                            </p>
+                            {% for document in email_instance.email_documents %}
+                                <p>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img alt="file icon" src="{{ email_instance.static_domain }}{% static "town_bulk_emails/images/file_icon.png" %}" width="16" height="16">
+                                    &#8202;
+                                    <a href="{{ email_instance.media_domain }}{{ document.file_url }}" target="_blank">{{ document.title }}</a>&nbsp;&nbsp;{{ document.extra_text }}
+                                </p>
+                            {% endfor %}
+
+                        {% endif %}
+
+                        <br>
+
+                    </div>
+
+                    <div style="margin: 16px 0 0 0; color: #656565;">
+                       <p>
+                            <a href="{{ protocol_domain }}{{ email_instance.page_url }}">View email in browser</a>
+                        </p>
+                        <p>
+                            <a href="{{ subscriptions_url }}">Manage subscriptions</a> or <a href="{{ quick_unsubscribe_url }}">unsubscribe</a>
+                        </p>
+                        <br>
+                    </div>
 
                 </div>
+
             </td>
         </tr>
     </table>
