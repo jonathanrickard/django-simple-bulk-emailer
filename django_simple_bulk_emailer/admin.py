@@ -234,8 +234,10 @@ def get_image_widths():
         width_choices = settings.EMAILER_IMAGE_WIDTHS
     except AttributeError:
         width_choices = [
-            (1080, 'Large'),
-            (200, 'Small'),
+            (1200, 'Banner'),
+            (900, 'Large'),
+            (600, 'Medium'),
+            (300, 'Small'),
         ]
     return width_choices
 

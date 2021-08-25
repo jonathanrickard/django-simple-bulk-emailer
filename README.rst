@@ -337,8 +337,10 @@ Sample settings
 **Default widths list** ::
 
     EMAILER_IMAGE_WIDTHS = [
-        (1080, 'Large'),
-        (200, 'Small'),
+        (1200, 'Banner'),
+        (900, 'Large'),
+        (600, 'Medium'),
+        (300, 'Small'),
     ]
 
 **Sample django-ckeditor configuration settings** ::
