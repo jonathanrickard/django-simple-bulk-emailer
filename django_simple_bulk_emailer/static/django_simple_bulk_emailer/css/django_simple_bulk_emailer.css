@@ -127,16 +127,25 @@
 .emailer_image {
     display: block;
     float: right;
-    width: 100%;
-    max-width: 400px;
+    width: 60%;
     margin: 0 0 2em 2em;
 }
 
+.emailer_image.banner {
+    width: 100%;
+    margin: 0 0 2em 0;
+}
+
+.emailer_image.medium {
+    max-width: 500px;
+}
+
 .emailer_image.small {
-    width: 200px;
+    max-width: 300px;
 }
 
 .emailer_image.mobile {
+    width: 100%;
     float: none;
     margin: 2em 0 1.25em 0;
 }

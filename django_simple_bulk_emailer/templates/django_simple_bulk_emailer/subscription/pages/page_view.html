@@ -53,9 +53,9 @@
         </div>
 
         {% if email_instance.email_image %}
-                <div class="emailer_image{% if email_instance.email_image.image_width == 200 %} small{% endif %}">
+                <div class="emailer_image{% if email_instance.email_image.image_width == 300 %} small{% endif %}{% if email_instance.email_image.image_width == 600 %} medium{% endif %}{% if email_instance.email_image.image_width == 1200 %} banner{% endif %}">
 
-                    <img width="100%" src="{{ email_instance.email_image.image_url }}" alt="{{ email_instance.email_image.description }}">
+                    <img src="{{ email_instance.email_image.image_url }}" alt="{{ email_instance.email_image.description }}" width="100%">
 
                     {% if email_instance.email_image.caption %}
                         <div id="emailer_caption">
@@ -69,7 +69,7 @@
         {% if email_instance.update_text %}
             <p>
                 <em>
-                    <strong>Updated at {{ email_instance.updated.time }} on {{ email_instance.updated|date:"N j, Y" }}:</strong> {{ email_instance.update_text }}
+                    <strong>Updated at {{ email_instance.updated|time }} on {{ email_instance.updated|date:"N j, Y" }}:</strong> {{ email_instance.update_text }}
                 </em>
             </p>
         {% endif %}
