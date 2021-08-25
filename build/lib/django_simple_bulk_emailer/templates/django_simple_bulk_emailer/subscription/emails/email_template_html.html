@@ -91,11 +91,11 @@
                         {% endif %}
 
                         {% if email_instance.email_image %}
-                            <table {% if email_instance.email_image.image_width == 200 %}width="200" align="right"{% else %}width="590" align="center"{% endif %}>
+                            <table {% if email_instance.email_image.image_width == 300 %}width="300" align="right"{% else %}width="590" align="center"{% endif %}>
                                 <tr>
                                     <td>
-                                        <div {% if email_instance.email_image.image_width == 200 %}style="margin: 5px 0 30px 30px;"{% else %}style="margin: 0 0 20px 0;"{% endif %}">
-                                            <img alt="{{ email_instance.email_image.description }}" src="{{ email_instance.media_domain }}{{ email_instance.email_image.image_url }}" width="{% if email_instance.email_image.image_width == 200 %}200{% else %}590{% endif %}">
+                                        <div {% if email_instance.email_image.image_width == 300 %}style="margin: 5px 0 30px 30px;"{% else %}style="margin: 0 0 20px 0;"{% endif %}">
+                                            <img src="{{ email_instance.media_domain }}{{ email_instance.email_image.image_url }}" alt="{{ email_instance.email_image.description }}" width="{% if email_instance.email_image.image_width == 300 %}300{% else %}590{% endif %}">
                                             {% if email_instance.email_image.caption %}
                                                 <div>
                                                     <p>
@@ -112,7 +112,7 @@
                         {% if email_instance.update_text %}
                             <p>
                                 <em>
-                                    <strong>Updated at {{ email_instance.updated.time }} on {{ email_instance.updated|date:"N j, Y" }}:</strong> {{ email_instance.update_text }}
+                                    <strong>Updated at {{ email_instance.updated|time }} on {{ email_instance.updated|date:"N j, Y" }}:</strong> {{ email_instance.update_text }}
                                 </em>
                             </p>
                         {% endif %}
@@ -127,7 +127,7 @@
                             </p>
                             {% for document in email_instance.email_documents %}
                                 <p>
-                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img alt="file icon" src="{{ email_instance.static_domain }}{% static "town_bulk_emails/images/file_icon.png" %}" width="16" height="16">
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="{{ email_instance.static_domain }}{% static "django_simple_bulk_emailer/images/file_icon_64x64.png" %}" alt="file icon" width="16" height="16">
                                     &#8202;
                                     <a href="{{ email_instance.media_domain }}{{ document.file_url }}" target="_blank">{{ document.title }}</a>&nbsp;&nbsp;{{ document.extra_text }}
                                 </p>

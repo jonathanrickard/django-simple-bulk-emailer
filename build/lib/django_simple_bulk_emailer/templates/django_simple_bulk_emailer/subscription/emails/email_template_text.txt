@@ -2,7 +2,7 @@
 
 {{ email_instance.secondary_headline }}{% endif %}{% if email_instance.update_text %}
 
-Updated at {{ email_instance.updated.time }} on {{ email_instance.updated|date:"N j, Y" }}: {{ email_instance.update_text }}{% endif %}
+Updated at {{ email_instance.updated|time }} on {{ email_instance.updated|date:"N j, Y" }}: {{ email_instance.update_text }}{% endif %}
 
 {{ email_instance.body_text|striptags }}
 {% if email_instance.email_documents %}
