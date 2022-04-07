@@ -751,7 +751,7 @@ class ListViewTests(MixinWrap.BaseMixin):
             'list_slug': self.subscription.list_slug,
         }
         for i in range(1, 12):
-            headline = 'Test headline number {}'.format(str(i))
+            headline = f'Test headline number {str(i)}'
             email = create_email(
                 headline=headline,
                 list_name=self.subscription.list_name,
@@ -789,7 +789,7 @@ class ListViewTests(MixinWrap.BaseMixin):
             '<a href="?q=&amp;page=2">',
         ]
         for i in range(2, 12):
-            headline = '>Test headline number {}<'.format(str(i))
+            headline = f'>Test headline number {str(i)}<'
             true_strings.append(headline)
         create_request_response(
             self,
@@ -815,7 +815,7 @@ class ListViewTests(MixinWrap.BaseMixin):
             '<a href="?q=&amp;page=',
         ]
         for i in range(1, 12):
-            headline = '>Test headline number {}<'.format(str(i))
+            headline = f'>Test headline number {str(i)}<'
             false_strings.append(headline)
         create_request_response(
             self,
@@ -835,7 +835,7 @@ class ListViewTests(MixinWrap.BaseMixin):
         ]
         false_strings = []
         for i in range(2, 12):
-            headline = '>Test headline number {}<'.format(str(i))
+            headline = f'>Test headline number {str(i)}<'
             false_strings.append(headline)
         create_request_response(
             self,
@@ -856,7 +856,7 @@ class ListViewTests(MixinWrap.BaseMixin):
                 '<a href="/mail_test/subscriptions/subscribe/">',
             ]
             for i in range(1, 12):
-                headline = '>Test headline number {}<'.format(str(i))
+                headline = f'>Test headline number {str(i)}<'
                 true_strings.append(headline)
             create_request_response(
                 self,
@@ -875,12 +875,12 @@ class ListViewTests(MixinWrap.BaseMixin):
                 '<a href="/mail_test/subscriptions/subscribe/">',
             ]
             for i in range(7, 12):
-                headline = '>Test headline number {}<'.format(str(i))
+                headline = f'>Test headline number {str(i)}<'
                 true_strings.append(headline)
             false_strings = [
             ]
             for i in range(1, 7):
-                headline = '>Test headline number {}<'.format(str(i))
+                headline = f'>Test headline number {str(i)}<'
                 false_strings.append(headline)
             create_request_response(
                 self,
@@ -898,7 +898,7 @@ class ListViewTests(MixinWrap.BaseMixin):
             '<a href="?q=&amp;page=2">',
         ]
         for i in range(2, 12):
-            headline = '>Test headline number {}<'.format(str(i))
+            headline = f'>Test headline number {str(i)}<'
             true_strings.append(headline)
         create_request_response(
             self,
@@ -1016,8 +1016,8 @@ class PageViewTests(PageViewPreviewBase):
                 '<meta property="og:type" content="article">',
                 '<meta property="og:description" content="Test body text paragraph one.">',
                 '<meta property="og:title" content="Test headline of many characters">',
-                '<meta property="og:image" content="http://127.0.0.1:8000/media/{}">'.format(file_name),
-                '<meta property="og:image:url" content="http://127.0.0.1:8000/media/{}">'.format(file_name),
+                f'<meta property="og:image" content="http://127.0.0.1:8000/media/{file_name}">',
+                f'<meta property="og:image:url" content="http://127.0.0.1:8000/media/{file_name}">',
                 '<meta property="og:image:type" content="image/png">',
                 '<meta property="og:image:width" content="1080">',
                 '<meta property="og:image:height" content="1080">',
@@ -1209,14 +1209,7 @@ class MCSyncTests(MixinWrap.BaseMixin):
         super().setUp()
 
     def create_url(self):
-        url_string = '{}{}{}?key={}'.format(
-            self.profile_instance.protocol,
-            self.profile_instance.domain,
-            reverse(
-                'django_simple_bulk_emailer:mc_sync',
-            ),
-            self.subscription_one.secret_key,
-        )
+        url_string = f"{self.profile_instance.protocol}{self.profile_instance.domain}{reverse('django_simple_bulk_emailer:mc_sync')}?key={self.subscription_one.secret_key}"
         return url_string
 
     def mock_all_webhooks(self, *args, **kwargs):
@@ -1296,11 +1289,7 @@ class MCSyncTests(MixinWrap.BaseMixin):
                         'post',
                         key=self.subscription_one.secret_key,
                     )
-                    extra_text = " — state tested was '{}'".format(
-                        self.states_dict.get(
-                            start_state,
-                        ),
-                    )
+                    extra_text = f" — state tested was '{self.states_dict.get(start_state)}'"
                     check_subscriber_subscription_state(
                         self,
                         self.original_email,
@@ -1337,11 +1326,7 @@ class MCSyncTests(MixinWrap.BaseMixin):
                         'post',
                         key=self.subscription_one.secret_key,
                     )
-                    extra_text = " — state tested was '{}'".format(
-                        self.states_dict.get(
-                            start_state,
-                        ),
-                    )
+                    extra_text = f" — state tested was '{self.states_dict.get(start_state)}'"
                     check_subscriber_subscription_state(
                         self,
                         self.original_email,
@@ -1382,11 +1367,7 @@ class MCSyncTests(MixinWrap.BaseMixin):
                         'post',
                         key=self.subscription_one.secret_key,
                     )
-                    extra_text = " — state tested was '{}'".format(
-                        self.states_dict.get(
-                            start_state,
-                        ),
-                    )
+                    extra_text = f" — state tested was '{self.states_dict.get(start_state)}'"
                     check_subscriber_subscription_state(
                         self,
                         self.original_email,
@@ -1479,14 +1460,7 @@ class MCSyncTests(MixinWrap.BaseMixin):
                             'post',
                             key=self.subscription_one.secret_key,
                         )
-                        extra_text = " — old state was '{}' and new state was '{}'".format(
-                            self.states_dict.get(
-                                original_start_state,
-                            ),
-                            self.states_dict.get(
-                                updated_start_state,
-                            ),
-                        )
+                        extra_text = f" — old state was '{self.states_dict.get(original_start_state)}' and new state was '{self.states_dict.get(updated_start_state)}'"
                         check_subscriber_subscription_state(
                             self,
                             self.original_email,
@@ -1611,9 +1585,7 @@ class MCSyncTests(MixinWrap.BaseMixin):
                     'list_id': 'testlistid',
                     'webhook_id': 'webhook_ID',
                     'data': {
-                        'url': '{}'.format(
-                            self.create_url(),
-                        )
+                        'url': f'{self.create_url()}'
                     },
                 }
                 json_contains(

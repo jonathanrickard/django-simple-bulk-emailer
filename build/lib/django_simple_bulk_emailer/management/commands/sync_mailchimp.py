@@ -67,17 +67,9 @@ class Command(BaseCommand):
                         subscriber_hash=subscriber_hash,
                         data=subscriber_data,
                     )
-                    print('Created or updated contact {} as {} in list {}'.format(
-                        subscriber.mc_email,
-                        subscriber.subscriber_email,
-                        subscription.list_name,
-                    ))
+                    print(f'Created or updated contact {subscriber.mc_email} as {subscriber.subscriber_email} in list {subscription.list_name}')
                 except MailChimpError:
-                    print('Unable to create or update contact {} as {} in list {}'.format(
-                        subscriber.mc_email,
-                        subscriber.subscriber_email,
-                        subscription.list_name,
-                    ))
+                    print(f'Unable to create or update contact {subscriber.mc_email} as {subscriber.subscriber_email} in list {subscription.list_name}')
                     try:
                         ''' If unable to pass subscriber data to MailChimp client, try subscriber_email address hash '''
                         subscriber_hash = get_hash(subscriber.subscriber_email)
@@ -86,21 +78,12 @@ class Command(BaseCommand):
                             subscriber_hash=subscriber_hash,
                             data=subscriber_data,
                         )
-                        print('Created or updated contact {} in list {}'.format(
-                            subscriber.subscriber_email,
-                            subscription.list_name,
-                        ))
+                        print(f'Created or updated contact {subscriber.subscriber_email} in list {subscription.list_name}')
                     except MailChimpError:
-                        print('Unable to create or update contact {} in list {}'.format(
-                            subscriber.subscriber_email,
-                            subscription.list_name,
-                        ))
+                        print(f'Unable to create or update contact {subscriber.subscriber_email} in list {subscription.list_name}')
                         ''' Remove subscription from subscriber if cannot be synced to MailChimp '''
                         subscriber.subscriptions.remove(subscription)
-                        print('Removed subscription {} from subscriber {}'.format(
-                            subscription.list_name,
-                            subscriber.subscriber_email,
-                        ))
+                        print(f'Removed subscription {subscription.list_name} from subscriber {subscriber.subscriber_email}')
 
             ''' For each nonsubscribed subscriber, try to unsubscribe its corresponding MailChimp contact '''
             subscriber_hash = get_hash(subscriber.subscriber_email)
@@ -119,20 +102,11 @@ class Command(BaseCommand):
                             subscriber_hash=subscriber_hash,
                             data=subscriber_data,
                         )
-                        print('Unsubscribed contact {} from list {}'.format(
-                            subscriber.subscriber_email,
-                            subscription.list_name,
-                        ))
+                        print(f'Unsubscribed contact {subscriber.subscriber_email} from list {subscription.list_name}')
                     except MailChimpError:
-                        print('Unable to unsubscribe contact {} from list {}'.format(
-                            subscriber.subscriber_email,
-                            subscription.list_name,
-                        ))
+                        print(f'Unable to unsubscribe contact {subscriber.subscriber_email} from list {subscription.list_name}')
             ''' Update the subscriber object's attributes '''
             subscriber.mc_email = subscriber.subscriber_email
             subscriber.mc_synced = True
             subscriber.save()
-            print('Completed syncing MailChimp for contact {} in list {}'.format(
-                subscriber.subscriber_email,
-                subscription.list_name,
-            ))
+            print(f'Completed syncing MailChimp for contact {subscriber.subscriber_email} in list {subscription.list_name}')

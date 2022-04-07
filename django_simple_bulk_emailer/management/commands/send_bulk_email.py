@@ -56,9 +56,9 @@ class Command(BaseCommand):
                 )
                 ''' Create email '''
                 email_directory = subscription.email_directory
-                basic_template = '{}/bulk_email_send.html'.format(get_universal_email_directory())
-                text_template = '{}/email_template_text.txt'.format(email_directory)
-                html_template = '{}/email_template_html.html'.format(email_directory)
+                basic_template = f'{get_universal_email_directory()}/bulk_email_send.html'
+                text_template = f'{email_directory}/email_template_text.txt'
+                html_template = f'{email_directory}/email_template_html.html'
                 site_domain = Site.objects.get_current().domain
                 site_profile = SiteProfile.objects.filter(
                     domain=site_domain,
@@ -85,11 +85,7 @@ class Command(BaseCommand):
                         },
                     )
                     email_content['tracking_image'] = tracking_image
-                    to_address = '"{} {}" <{}>'.format(
-                        subscriber.first_name,
-                        subscriber.last_name,
-                        subscriber.subscriber_email,
-                    )
+                    to_address = f'"{subscriber.first_name} {subscriber.last_name}" <{subscriber.subscriber_email}>'
                     ''' Send email '''
                     send_email(
                         email_content,
@@ -104,11 +100,14 @@ class Command(BaseCommand):
                     number_sent += 1
                 ''' Create send history '''
                 send_complete = timezone.now()
-                email_instance.send_history = '<ul><li>Completed: {}<ul><li>Sent to: {}</li></ul></li></ul>{}'.format(
-                    localize(timezone.localtime(send_complete)),
-                    email_instance.subscription_list,
-                    email_instance.send_history,
-                )
+                email_instance.send_history = f'<ul>' \
+                                              f'<li>Completed: {localize(timezone.localtime(send_complete))}' \
+                                              f'<ul>' \
+                                              f'<li>Sent to: {email_instance.subscription_list}</li>' \
+                                              f'</ul>' \
+                                              f'</li>' \
+                                              f'</ul>' \
+                                              f'{email_instance.send_history}'
                 ''' Release email to be sent again '''
                 email_instance.sending = False
                 email_instance.save()

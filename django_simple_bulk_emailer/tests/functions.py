@@ -225,7 +225,7 @@ def create_user(permission_list=None):
 
 
 def create_request_response(self, get_post, page='1', key='empty', time_dict=None):
-    reverse_name = 'django_simple_bulk_emailer:{}'.format(self.view_name)
+    reverse_name = f'django_simple_bulk_emailer:{self.view_name}'
     with self.settings(
         SITE_ID=self.profile_instance.site_ptr.id,
     ):
@@ -234,15 +234,9 @@ def create_request_response(self, get_post, page='1', key='empty', time_dict=Non
             kwargs=self.kwargs,
         )
         if page != '1':
-            reverse_string = '{}?page={}'.format(
-                reverse_string,
-                page,
-            )
+            reverse_string = f'{reverse_string}?page={page}'
         if key != 'empty':
-            reverse_string = '{}?key={}'.format(
-                reverse_string,
-                key,
-            )
+            reverse_string = f'{reverse_string}?key={key}'
         if get_post == 'post':
             self.request = RequestFactory().post(
                 reverse_string,
@@ -384,70 +378,42 @@ def clear_data_and_files():
 
 def attribute_equals(self, attr_dict, command=False):
     if command:
-        inserted_text = "command '{}'".format(
-            self.test_command,
-        )
+        inserted_text = f"command '{self.test_command}'"
     else:
-        inserted_text = "model '{}'".format(
-            self.test_instance.__class__.__name__,
-        )
+        inserted_text = f"model '{self.test_instance.__class__.__name__}'"
     for key, value in attr_dict.items():
-        error_msg = "For {}, the value of attribute '{}' was not '{}'".format(
-            inserted_text,
-            key,
-            value,
-        )
+        error_msg = f"For {inserted_text}, the value of attribute '{key}' was not '{value}'"
         attr = getattr(self.test_instance, key)
         self.assertTrue(attr == value, error_msg)
 
 
 def attribute_length_equals(self, attr_name, value):
-    error_msg = "For model '{}', the length of attribute '{}' was not '{}'".format(
-        self.test_instance.__class__.__name__,
-        attr_name,
-        value,
-    )
+    error_msg = f"For model '{self.test_instance.__class__.__name__}', the length of attribute '{attr_name}' was not '{value}'"
     attr = getattr(self.test_instance, attr_name)
     self.assertIs(len(attr), value, error_msg)
 
 
 def method_output_equals(self, attr_name, value):
-    error_msg = "For model '{}', the output of method '{}' was not '{}'".format(
-        self.test_instance.__class__.__name__,
-        attr_name,
-        value,
-    )
+    error_msg = f"For model '{self.test_instance.__class__.__name__}', the output of method '{attr_name}' was not '{value}'"
     function = getattr(self.test_instance, attr_name)
     self.assertTrue(function() == value, error_msg)
 
 
 def method_output_contains(self, attr_name, value):
-    error_msg = "For model '{}', the output of method '{}' did not contain '{}'".format(
-        self.test_instance.__class__.__name__,
-        attr_name,
-        value,
-    )
+    error_msg = f"For model '{self.test_instance.__class__.__name__}', the output of method '{attr_name}' did not contain '{value}'"
     function = getattr(self.test_instance, attr_name)
     self.assertIn(value, function(), error_msg)
 
 
 def method_output_length_equals(self, attr_name, value):
-    error_msg = "For model '{}', the length of the output of method '{}' was not '{}'".format(
-        self.test_instance.__class__.__name__,
-        attr_name,
-        value,
-    )
+    error_msg = f"For model '{self.test_instance.__class__.__name__}', the length of the output of method '{attr_name}' was not '{value}'"
     function = getattr(self.test_instance, attr_name)
     self.assertIs(len(function()), value, error_msg)
 
 
 def email_exists(self, headline, boolean):
-    error_msg_true = "An email with headline '{}' does not exist".format(
-        headline,
-    )
-    error_msg_false = "An email with headline '{}' should not exist".format(
-        headline,
-    )
+    error_msg_true = f"An email with headline '{headline}' does not exist"
+    error_msg_false = f"An email with headline '{headline}' should not exist"
     try:
         bulk_email = BulkEmail.objects.get(
             headline=headline,
@@ -461,14 +427,8 @@ def email_exists(self, headline, boolean):
 
 
 def stats_exist(self, year_int, month_int, boolean):
-    error_msg_true = "Monthly stats with year '{}' and month '{}' do not exist".format(
-        str(year_int),
-        str(month_int),
-    )
-    error_msg_false = "Monthly stats with year '{}' and month '{}' should not exist".format(
-        str(year_int),
-        str(month_int),
-    )
+    error_msg_true = f"Monthly stats with year '{str(year_int)}' and month '{str(month_int)}' do not exist"
+    error_msg_false = f"Monthly stats with year '{str(year_int)}' and month '{str(month_int)}' should not exist"
     try:
         stats = MonthlyStat.objects.get(
             year_int=year_int,
@@ -484,21 +444,11 @@ def stats_exist(self, year_int, month_int, boolean):
 
 def subscriber_exists(self, subscriber_email, boolean, extra_text=''):
     try:
-        first_text = "For view '{}', a".format(
-            self.view_name,
-        )
+        first_text = f"For view '{self.view_name}', a"
     except AttributeError:
         first_text = 'A'
-    error_msg_true = "{} subscriber with email address '{}' does not exist{}".format(
-        first_text,
-        subscriber_email,
-        extra_text,
-    )
-    error_msg_false = "{} subscriber with email address '{}' should not exist{}".format(
-        first_text,
-        subscriber_email,
-        extra_text,
-    )
+    error_msg_true = f"{first_text} subscriber with email address '{subscriber_email}' does not exist{extra_text}"
+    error_msg_false = f"{first_text} subscriber with email address '{subscriber_email}' should not exist{extra_text}"
     try:
         subscriber = Subscriber.objects.get(
             subscriber_email=subscriber_email,
@@ -513,22 +463,13 @@ def subscriber_exists(self, subscriber_email, boolean, extra_text=''):
 
 def check_subscriber_count(self, count):
     subscriber_count = Subscriber.objects.count()
-    error_msg = "For view '{}', the number of subscribers was '{}', not '{}'".format(
-        self.view_name,
-        str(subscriber_count),
-        str(count),
-    )
+    error_msg = f"For view '{self.view_name}', the number of subscribers was '{str(subscriber_count)}', not '{str(count)}'"
     self.assertEqual(subscriber_count, count, error_msg)
 
 
 def check_subscription_count(self, count):
     subscription_count = self.subscriber.subscriptions.count()
-    error_msg = "For view '{}', subscriber '{}', the number of subscriptions was '{}', not '{}'".format(
-        self.view_name,
-        self.subscriber.subscriber_email,
-        str(subscription_count),
-        str(count),
-    )
+    error_msg = f"For view '{self.view_name}', subscriber '{self.subscriber.subscriber_email}', the number of subscriptions was '{str(subscription_count)}', not '{str(count)}'"
     self.assertEqual(subscription_count, count, error_msg)
 
 
@@ -539,38 +480,23 @@ def check_attached_trackers(self, count_dict=None, set_dict=None):
         set_dict = {}
     for key, value in count_dict.items():
         tracker_count = getattr(self.test_instance, key).count()
-        error_msg = "For command '{}', the number of trackers assigned to '{}' was '{}', not '{}'".format(
-            self.test_command,
-            key,
-            str(tracker_count),
-            str(value),
-        )
+        error_msg = f"For command '{self.test_command}', the number of trackers assigned to '{key}' was '{str(tracker_count)}', not '{str(value)}'"
         self.assertEqual(tracker_count, value, error_msg)
     for key, value in set_dict.items():
         tracker_list = list(getattr(self.test_instance, key).all())
         value_list = list(value)
-        error_msg = "For command '{}', the list of trackers assigned to '{}' was '{}', not '{}'".format(
-            self.test_command,
-            key,
-            str(tracker_list),
-            str(value_list),
-        )
+        error_msg = f"For command '{self.test_command}', the list of trackers assigned to '{key}' was '{str(tracker_list)}', not '{str(value_list)}'"
         self.assertEqual(tracker_list, value_list, error_msg)
 
 
 def check_site_profile_count(self, count):
     site_profile_count = SiteProfile.objects.count()
-    error_msg = "The number of site profiles was '{}', not '{}'".format(
-        str(site_profile_count),
-        str(count),
-    )
+    error_msg = f"The number of site profiles was '{str(site_profile_count)}', not '{str(count)}'"
     self.assertEqual(site_profile_count, count, error_msg)
 
 
 def check_site_profile(self, test_site, test_dict):
-    error_msg_exists = "A site profile matching the site with domain '{}' does not exist".format(
-        test_dict['domain'],
-    )
+    error_msg_exists = f"A site profile matching the site with domain '{test_dict['domain']}' does not exist"
     try:
         site_profile = SiteProfile.objects.get(
             site_ptr=test_site,
@@ -578,16 +504,9 @@ def check_site_profile(self, test_site, test_dict):
         profile_created = True
         for key, value in test_dict.items():
             attr_value = getattr(site_profile, key)
-            error_msg_attr = "A site profile that should have had the value '{}' for attribute '{}' instead had '{}'".format(
-                test_dict[key],
-                key,
-                attr_value,
-            )
+            error_msg_attr = f"A site profile that should have had the value '{test_dict[key]}' for attribute '{key}' instead had '{attr_value}'"
             self.assertEqual(value, attr_value, error_msg_attr)
-        error_msg_protocol = "The site profile with domain '{}' had the protocol '{}' and not 'https://'".format(
-            site_profile.domain,
-            site_profile.protocol,
-        )
+        error_msg_protocol = f"The site profile with domain '{site_profile.domain}' had the protocol '{site_profile.protocol}' and not 'https://'"
         self.assertEqual(site_profile.protocol, 'https://', error_msg_protocol)
     except ObjectDoesNotExist:
         profile_created = False
@@ -610,21 +529,8 @@ def check_subscriber_attributes(self, subscriber_email, attributes, boolean, ext
         'mc_email': checked_subscriber.mc_email,
     },
     for key in attributes.keys():
-        error_msg_true = "For view '{}', subscriber '{}', the value of '{}' was '{}', not '{}'{}".format(
-            self.view_name,
-            subscriber_email,
-            key,
-            subscriber_data[0][key],
-            attributes[key],
-            extra_text,
-        )
-        error_msg_false = "For view '{}', subscriber '{}', the value of '{}' should not be '{}'{}".format(
-            self.view_name,
-            subscriber_email,
-            key,
-            attributes[key],
-            extra_text,
-        )
+        error_msg_true = f"For view '{self.view_name}', subscriber '{subscriber_email}', the value of '{key}' was '{subscriber_data[0][key]}', not '{attributes[key]}'{extra_text}"
+        error_msg_false = f"For view '{self.view_name}', subscriber '{subscriber_email}', the value of '{key}' should not be '{attributes[key]}'{extra_text}"
         if boolean:
             self.assertEqual(attributes[key], subscriber_data[0][key], error_msg_true)
         else:
@@ -633,18 +539,11 @@ def check_subscriber_attributes(self, subscriber_email, attributes, boolean, ext
 
 def check_quantity_email_sent(self, quantity, clear_outbox=False, extra_text=''):
     try:
-        first_text = "For view '{}', t".format(
-            self.view_name,
-        )
+        first_text = f"For view '{self.view_name}', t"
     except AttributeError:
         first_text = 'T'
     emails_sent = len(mail.outbox)
-    error_msg = "{}he number of emails sent was '{}', not '{}'{}".format(
-        first_text,
-        str(emails_sent),
-        str(quantity),
-        extra_text,
-    )
+    error_msg = f"{first_text}he number of emails sent was '{str(emails_sent)}', not '{str(quantity)}'{extra_text}"
     self.assertEqual(emails_sent, quantity, error_msg)
     if clear_outbox:
         mail.outbox = []
@@ -652,11 +551,7 @@ def check_quantity_email_sent(self, quantity, clear_outbox=False, extra_text='')
 
 def check_quantity_trackers(self, quantity):
     tracker_count = EmailTracker.objects.count()
-    error_msg = "For command '{}', the number of trackers existing was '{}', not '{}'".format(
-        self.test_command,
-        str(tracker_count),
-        str(quantity),
-    )
+    error_msg = f"For command '{self.test_command}', the number of trackers existing was '{str(tracker_count)}', not '{str(quantity)}'"
     self.assertEqual(tracker_count, quantity, error_msg)
 
 
@@ -664,27 +559,12 @@ def check_email(self, email_number=0, subject=None, text_strings=None, html_stri
     checked_email = mail.outbox[email_number]
     email_subject = checked_email.subject
     try:
-        inserted_text = "view '{}'".format(
-            self.view_name,
-        )
+        inserted_text = f"view '{self.view_name}'"
     except AttributeError:
-        inserted_text = "command '{}'".format(
-            self.test_command,
-        )
-    error_msg_one = "For {}, email number '{}' did not have HTML alternative attached".format(
-        inserted_text,
-        str(email_number),
-    )
-    error_msg_two = "For {}, email number '{}', HTML attachment did not have the MIME type 'text/html'".format(
-        inserted_text,
-        str(email_number),
-    )
-    error_msg_three = "For {}, email number '{}' had the subject '{}', not '{}'".format(
-        inserted_text,
-        str(email_number),
-        email_subject,
-        subject,
-    )
+        inserted_text = f"command '{self.test_command}'"
+    error_msg_one = f"For {inserted_text}, email number '{str(email_number)}' did not have HTML alternative attached"
+    error_msg_two = f"For {inserted_text}, email number '{str(email_number)}', HTML attachment did not have the MIME type 'text/html'"
+    error_msg_three = f"For {inserted_text}, email number '{str(email_number)}' had the subject '{email_subject}', not '{subject}'"
     self.assertEqual(len(checked_email.alternatives), 1, error_msg_one)
     self.assertEqual(checked_email.alternatives[0][1], 'text/html', error_msg_two)
     if subject:
@@ -701,33 +581,19 @@ def check_email(self, email_number=0, subject=None, text_strings=None, html_stri
 
 def status_code_equals(self, status_code):
     returned_code = self.response.status_code
-    error_msg = "For view '{}', the status code returned was '{}', not '{}'".format(
-        self.view_name,
-        str(returned_code),
-        str(status_code),
-    )
+    error_msg = f"For view '{self.view_name}', the status code returned was '{str(returned_code)}', not '{str(status_code)}'"
     self.assertEqual(returned_code, status_code, error_msg)
 
 
 def redirect_url_equals(self, redirect_url):
     returned_url = self.response.url
-    error_msg = "For view '{}', the redirect URL returned was '{}', not '{}'".format(
-        self.view_name,
-        returned_url,
-        redirect_url,
-    )
+    error_msg = f"For view '{self.view_name}', the redirect URL returned was '{returned_url}', not '{redirect_url}'"
     self.assertEqual(returned_url, redirect_url, error_msg)
 
 
 def session_contains(self, value, boolean):
-    error_msg_true = "For view '{}', the session did not contain '{}'".format(
-        self.view_name,
-        value,
-    )
-    error_msg_false = "For view '{}', the session should not contain '{}'".format(
-        self.view_name,
-        value,
-    )
+    error_msg_true = f"For view '{self.view_name}', the session did not contain '{value}'"
+    error_msg_false = f"For view '{self.view_name}', the session should not contain '{value}'"
     if boolean:
         self.assertTrue(value in self.request.session, error_msg_true)
     else:
@@ -740,23 +606,11 @@ def email_contains(self, checked_email, email_number, inserted_text, text_string
     if html_strings is None:
         html_strings = []
     for string in text_strings:
-        error_msg = "For {}, email number '{}' did not include '{}' in its text body".format(
-            inserted_text,
-            str(email_number),
-            string,
-        )
+        error_msg = f"For {inserted_text}, email number '{str(email_number)}' did not include '{string}' in its text body"
         self.assertIn(string, checked_email.body, error_msg)
     for string in html_strings:
-        error_msg_one = "For {}, email number '{}' should not include '{}' in its text body".format(
-            inserted_text,
-            str(email_number),
-            string,
-        )
-        error_msg_two = "For {}, email number '{}' did not include '{}' in its HTML body".format(
-            inserted_text,
-            str(email_number),
-            string,
-        )
+        error_msg_one = f"For {inserted_text}, email number '{str(email_number)}' should not include '{string}' in its text body"
+        error_msg_two = f"For {inserted_text}, email number '{str(email_number)}' did not include '{string}' in its HTML body"
         self.assertNotIn(string, checked_email.body, error_msg_one)
         self.assertIn(string, checked_email.alternatives[0][0], error_msg_two)
 
@@ -767,24 +621,14 @@ def html_contains(self, test_string, true_strings=None, false_strings=None):
     if false_strings is None:
         false_strings = []
     try:
-        inserted_text = "view '{}'".format(
-            self.view_name,
-        )
+        inserted_text = f"view '{self.view_name}'"
     except AttributeError:
-        inserted_text = "command '{}'".format(
-            self.test_command,
-        )
+        inserted_text = f"command '{self.test_command}'"
     for string in true_strings:
-        error_msg = "For {}, the HTML did not contain '{}'".format(
-            inserted_text,
-            string,
-        )
+        error_msg = f"For {inserted_text}, the HTML did not contain '{string}'"
         self.assertTrue(string in test_string, error_msg)
     for string in false_strings:
-        error_msg = "For {}, the HTML should not contain '{}'".format(
-            inserted_text,
-            string,
-        )
+        error_msg = f"For {inserted_text}, the HTML should not contain '{string}'"
         self.assertFalse(string in test_string, error_msg)
 
 
@@ -799,29 +643,14 @@ def json_contains(self, json_data=None, true_dict=None, false_dict=None):
     else:
         data = json_data
     for key, value in true_dict.items():
-        error_msg_key = "For view '{}', the JSON data did not contain the key '{}'".format(
-            self.view_name,
-            str(key),
-        )
-        error_msg_value = "For view '{}', the JSON data value for key '{}' was '{}' and not '{}'".format(
-            self.view_name,
-            str(key),
-            str(data[key]),
-            str(value),
-        )
+        error_msg_key = f"For view '{self.view_name}', the JSON data did not contain the key '{str(key)}'"
+        error_msg_value = f"For view '{self.view_name}', the JSON data value for key '{str(key)}' was '{str(data[key])}' and not '{str(value)}'"
         self.assertIn(key, data.keys(), error_msg_key)
         self.assertEqual(value, data[key], error_msg_value)
 
     for key, value in false_dict.items():
-        error_msg_key = "For view '{}', the JSON data should not contain the key '{}'".format(
-            self.view_name,
-            str(key),
-        )
-        error_msg_value = "For view '{}', the JSON data value for key '{}' should not be '{}'".format(
-            self.view_name,
-            str(key),
-            str(value),
-        )
+        error_msg_key = f"For view '{self.view_name}', the JSON data should not contain the key '{str(key)}'"
+        error_msg_value = f"For view '{self.view_name}', the JSON data value for key '{str(key)}' should not be '{str(value)}'"
         self.assertNotIn(key, data.keys(), error_msg_key)
         self.assertFalse(value, data[key], error_msg_value)
 
@@ -832,11 +661,7 @@ def image_contains(self, image_dict=None):
     image_data = BytesIO(self.response.content)
     image_file = Image.open(image_data)
     for key, value in image_dict.items():
-        error_msg = "For view '{}', the returned image's property '{}' was not '{}'".format(
-            self.view_name,
-            key,
-            str(value),
-        )
+        error_msg = f"For view '{self.view_name}', the returned image's property '{key}' was not '{str(value)}'"
         image_property = getattr(image_file, key)
         self.assertIs(image_property, value, error_msg)
 
@@ -885,12 +710,8 @@ def check_permission(self, boolean):
         permission = True
     except PermissionDenied:
         permission = False
-    error_msg_true = "For view '{}', access permission was denied".format(
-        self.view_name,
-    )
-    error_msg_false = "For view '{}', access permission was given".format(
-        self.view_name,
-    )
+    error_msg_true = f"For view '{self.view_name}', access permission was denied"
+    error_msg_false = f"For view '{self.view_name}', access permission was given"
     if boolean:
         self.assertTrue(permission, error_msg_true)
     else:
@@ -906,12 +727,8 @@ def check_not_found(self, boolean):
         not_found = False
     except Http404:
         not_found = True
-    error_msg_true = "For view '{}', a 404 error was not returned".format(
-        self.view_name,
-    )
-    error_msg_false = "For view '{}', a 404 error was returned".format(
-        self.view_name,
-    )
+    error_msg_true = f"For view '{self.view_name}', a 404 error was not returned"
+    error_msg_false = f"For view '{self.view_name}', a 404 error was returned"
     if boolean:
         self.assertTrue(not_found, error_msg_true)
     else:
@@ -967,12 +784,8 @@ def check_form_is_valid(self, boolean, extra_text=''):
     self.form = self.form_class(
         data=self.data,
     )
-    error_msg_true = 'The form is not valid but should be{}'.format(
-        extra_text,
-    )
-    error_msg_false = 'The form is valid but should not be{}'.format(
-        extra_text,
-    )
+    error_msg_true = f'The form is not valid but should be{extra_text}'
+    error_msg_false = f'The form is valid but should not be{extra_text}'
     if boolean:
         self.assertTrue(self.form.is_valid(), error_msg_true)
     else:
@@ -988,12 +801,8 @@ def check_field_in_form(self, key, boolean):
         key_present = True
     else:
         key_present = False
-    error_msg_true = "The key '{}' was not present in the form's cleaned data and should have been".format(
-        key,
-    )
-    error_msg_false = "The key '{}' was present in the form's cleaned data and should not have been".format(
-        key,
-    )
+    error_msg_true = f"The key '{key}' was not present in the form's cleaned data and should have been"
+    error_msg_false = f"The key '{key}' was present in the form's cleaned data and should not have been"
     if boolean:
         self.assertTrue(key_present, error_msg_true)
     else:

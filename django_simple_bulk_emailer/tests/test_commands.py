@@ -307,17 +307,13 @@ class SendBulkEmailTests(MixinWrap.BaseMixin):
                             self.list_one_name,
                             state_one,
                         )
-                        list_one_state = 'list one {}'.format(
-                            list_states[state_one],
-                        )
+                        list_one_state = f'list one {list_states[state_one]}'
                         create_subscription_email_state(
                             self,
                             self.list_two_name,
                             state_two,
                         )
-                        list_two_state = '; list two {}'.format(
-                            list_states[state_two],
-                        )
+                        list_two_state = f'; list two {list_states[state_two]}'
                         list_one_emails_marked_send = 0
                         list_two_emails_marked_send = 0
                         if state_one == 3 or state_one == 5 or state_one == 7:
@@ -342,9 +338,7 @@ class SendBulkEmailTests(MixinWrap.BaseMixin):
                             'LastOne',
                             state_three,
                         )
-                        subscriber_one_state = '; subscriber one {}'.format(
-                            subscriber_states[state_three],
-                        )
+                        subscriber_one_state = f'; subscriber one {subscriber_states[state_three]}'
                         create_subscriber_subscription_state(
                             self,
                             self.subscriber_two_email,
@@ -352,15 +346,8 @@ class SendBulkEmailTests(MixinWrap.BaseMixin):
                             'LastTwo',
                             state_four,
                         )
-                        subscriber_two_state = '; subscriber two {}'.format(
-                            subscriber_states[state_four],
-                        )
-                        extra_text = ' — {}{}{}{}'.format(
-                            list_one_state,
-                            list_two_state,
-                            subscriber_one_state,
-                            subscriber_two_state,
-                        )
+                        subscriber_two_state = f'; subscriber two {subscriber_states[state_four]}'
+                        extra_text = f' — {list_one_state}{list_two_state}{subscriber_one_state}{subscriber_two_state}'
                         list_one_subscribers = 0
                         list_two_subscribers = 0
                         if state_three == 2 or state_three == 4:
@@ -551,12 +538,8 @@ class SendBulkEmailTests(MixinWrap.BaseMixin):
             )
             call_test_command(self)
             bulk_email.refresh_from_db()
-            completed_string = '<ul><li>Completed: {}'.format(
-                localize(timezone.localtime(fake_now())),
-            )
-            list_name_string = '<ul><li>Sent to: {}</li></ul></li></ul>'.format(
-                self.list_one_name,
-            )
+            completed_string = f'<ul><li>Completed: {localize(timezone.localtime(fake_now()))}'
+            list_name_string = f'<ul><li>Sent to: {self.list_one_name}</li></ul></li></ul>'
             html_contains(
                 self,
                 bulk_email.send_history,
@@ -647,14 +630,11 @@ class SyncMailChimpTests(MixinWrap.BaseMixin):
         return subscriber_data
 
     def generate_error_msg(self, *args, function_name=None, called_with=None, called_kwargs=None):
-        error_msg = "MailChimp '{}' function should be called with:\n" \
-                    "{}\n" \
-                    "It was instead called with:\n" \
-                    "{}\n".format(
-                        function_name,
-                        called_with,
-                        called_kwargs,
-                    )
+        error_msg = \
+            f"MailChimp '{function_name}' function should be called with:\n" \
+            f"{called_with}\n" \
+            f"It was instead called with:\n" \
+            f"{called_kwargs}\n"
         return error_msg
 
     def mock_create_or_update(self, *args, **kwargs):
@@ -1240,9 +1220,7 @@ class UpdateEmailStatsTests(MixinWrap.BaseMixin):
             true_strings=[
                 ' id="emailer_row_odd">',
                 '<td id="emailer_numerical">1.</td>',
-                '<td>{}<br>Jan. 1, 2020, midnight</td>'.format(
-                    current_subject_two,
-                ),
+                f'<td>{current_subject_two}<br>Jan. 1, 2020, midnight</td>',
                 '<td id="emailer_numerical">4</td>',
                 '<td id="emailer_numerical">3</td>',
                 '<td id="emailer_numerical">75.0%</td>',
@@ -1255,9 +1233,7 @@ class UpdateEmailStatsTests(MixinWrap.BaseMixin):
             true_strings=[
                 ' id="emailer_row_even">',
                 '<td id="emailer_numerical">2.</td>',
-                '<td>{}<br>Jan. 1, 2020, midnight</td>'.format(
-                    current_subject_one,
-                ),
+                f'<td>{current_subject_one}<br>Jan. 1, 2020, midnight</td>',
                 '<td id="emailer_numerical">2</td>',
                 '<td id="emailer_numerical">1</td>',
                 '<td id="emailer_numerical">50.0%</td>',
@@ -1273,7 +1249,7 @@ class UpdateEmailStatsTests(MixinWrap.BaseMixin):
                 '<td id="emailer_numerical">Totals:<br><br></td>',
                 '<td id="emailer_numerical">6<br><br></td>',
                 '<td id="emailer_numerical">4<br><br></td>',
-                '<td id="emailer_numerical">66.7%<br><br></td> ',
+                '<td id="emailer_numerical">66.7%<br><br></td>',
                 '</tr>',
             ],
         )
@@ -1296,9 +1272,7 @@ class UpdateEmailStatsTests(MixinWrap.BaseMixin):
             true_strings=[
                 ' id="emailer_row_odd">',
                 '<td id="emailer_numerical">1.</td>',
-                '<td>{}<br>Dec. 1, 2019, midnight</td>'.format(
-                    older_subject_two,
-                ),
+                f'<td>{older_subject_two}<br>Dec. 1, 2019, midnight</td>',
                 '<td id="emailer_numerical">3</td>',
                 '<td id="emailer_numerical">3</td>',
                 '<td id="emailer_numerical">100.0%</td>',
@@ -1311,9 +1285,7 @@ class UpdateEmailStatsTests(MixinWrap.BaseMixin):
             true_strings=[
                 ' id="emailer_row_even">',
                 '<td id="emailer_numerical">2.</td>',
-                '<td>{}<br>Nov. 1, 2019, midnight</td>'.format(
-                    older_subject_one,
-                ),
+                f'<td>{older_subject_one}<br>Nov. 1, 2019, midnight</td>',
                 '<td id="emailer_numerical">4</td>',
                 '<td id="emailer_numerical">1</td>',
                 '<td id="emailer_numerical">25.0%</td>',
@@ -1329,7 +1301,7 @@ class UpdateEmailStatsTests(MixinWrap.BaseMixin):
                 '<td id="emailer_numerical">Totals:<br><br></td>',
                 '<td id="emailer_numerical">7<br><br></td>',
                 '<td id="emailer_numerical">4<br><br></td>',
-                '<td id="emailer_numerical">57.1%<br><br></td> ',
+                '<td id="emailer_numerical">57.1%<br><br></td>',
                 '</tr>',
             ],
         )

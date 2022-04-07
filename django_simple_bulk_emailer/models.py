@@ -71,7 +71,7 @@ class SiteProfile(BaseMixin, Site):
     )
 
     def protocol_domain(self):
-        return '{}{}'.format(self.protocol, self.domain)
+        return f'{self.protocol}{self.domain}'
 
 
 def create_default_key():
@@ -161,9 +161,7 @@ class Subscription(BaseMixin):
                 },
             )
             return mark_safe(
-                '<a href="{}" target="_blank">Page</a>'.format(
-                    page_url,
-                )
+                f'<a href="{page_url}" target="_blank">Page</a>'
             )
         else:
             return ''
@@ -173,7 +171,7 @@ class Subscription(BaseMixin):
         subscriber_count = Subscriber.objects.filter(
             subscriptions=self,
         ).count()
-        return '{:,}'.format(subscriber_count)
+        return f'{subscriber_count:,}'
 
     def save(self, *args, **kwargs):
         self.list_slug = slugify(self.list_name)
@@ -225,7 +223,7 @@ class Subscriber(BaseMixin):
         subscription_set = self.subscriptions.all().order_by(
             'list_name',
         )
-        return ''.join('{}, '.format(subscription_item) for subscription_item in subscription_set)[:-2]
+        return ''.join(f'{subscription_item}, ' for subscription_item in subscription_set)[:-2]
 
 
 def get_deletion_date():
@@ -285,7 +283,7 @@ class BulkEmail(BaseMixin):
 
     def short_headline(self):
         if len(self.headline) > 30:
-            headline = '{}...'.format(self.headline[:27])
+            headline = f'{self.headline[:27]}...'
         else:
             headline = self.headline
         return headline
@@ -299,7 +297,7 @@ class BulkEmail(BaseMixin):
 
     def email_subject(self):
         if self.update_text:
-            return 'Updated: {}'.format(self.headline)
+            return f'Updated: {self.headline}'
         else:
             return self.headline
 
@@ -372,9 +370,7 @@ class BulkEmail(BaseMixin):
                     kwargs=self.reverse_kwargs(),
                 )
                 link = mark_safe(
-                    '<a href="{}" target="_blank">Page</a>'.format(
-                        preview_url,
-                    )
+                    f'<a href="{preview_url}" target="_blank">Page</a>'
                 )
             else:
                 link = ''
@@ -393,9 +389,7 @@ class BulkEmail(BaseMixin):
                 },
             )
             link = mark_safe(
-                '<a href="{}">Email</a>'.format(
-                    preview_url,
-                )
+                f'<a href="{preview_url}">Email</a>'
             )
         except AttributeError:
             link = ''
@@ -524,10 +518,7 @@ class MonthlyStat(BaseMixin):
     )
 
     def month_and_year(self):
-        return '{} {}'.format(
-            calendar.month_name[self.month_int],
-            str(self.year_int),
-        )
+        return f'{calendar.month_name[self.month_int]} {str(self.year_int)}'
 
     def __str__(self):
         return self.month_and_year()
@@ -535,9 +526,7 @@ class MonthlyStat(BaseMixin):
     def stat_table(self):
         if self.stat_data:
             return mark_safe(
-                '<table id="emailer_table">{}</table>'.format(
-                    self.stat_data,
-                )
+                f'<table id="emailer_table">{self.stat_data}</table>'
             )
         else:
             return ''

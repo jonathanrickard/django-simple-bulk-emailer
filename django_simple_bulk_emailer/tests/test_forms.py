@@ -149,9 +149,7 @@ class ModifySubscriberFormTests(SubscriptionSelectorModifySubscriberFormBase):
         for key, value in self.data.items():
             old_value = value
             self.data[key] = ''
-            extra_text = " — the field being tested was '{}'".format(
-                key,
-            )
+            extra_text = f" — the field being tested was '{key}'"
             check_form_is_valid(
                 self,
                 False,

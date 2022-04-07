@@ -65,14 +65,14 @@ class Command(BaseCommand):
             sent_tally = 0
             open_tally = 0
             monthly_stat.stat_data = \
-                '{} \
-                <tr id="emailer_title_row"> \
-                <td>&nbsp;</td> \
-                <td>{}</td> \
-                <td id="emailer_numerical">Sent</td> \
-                <td id="emailer_numerical">Opens</td> \
-                <td></td> \
-                </tr>'.format(monthly_stat.stat_data, name)
+                f'{monthly_stat.stat_data}' \
+                f'<tr id="emailer_title_row">' \
+                f'<td>&nbsp;</td>' \
+                f'<td>{name}</td>' \
+                f'<td id="emailer_numerical">Sent</td>' \
+                f'<td id="emailer_numerical">Opens</td>' \
+                f'<td></td>' \
+                f'</tr>'
             ''' Get appropriate group of trackers '''
             if name == 'Older emails':
                 subscription_trackers = monthly_stat.older_trackers.all()
@@ -107,55 +107,41 @@ class Command(BaseCommand):
                         row_id = 'emailer_row_odd'
                     else:
                         row_id = 'emailer_row_even'
-                    row_number_str = '{}.'.format(str(row_number))
+                    row_number_str = f'{str(row_number)}.'
                     tracker_data = email[1]
-                    opens = '{:,}'.format(tracker_data[0])
-                    sent = '{:,}'.format(tracker_data[1])
+                    opens = f'{tracker_data[0]:,}'
+                    sent = f'{tracker_data[1]:,}'
                     if tracker_data[0] != 0 and tracker_data[1] != 0:
-                        percentage = '{:.1%}'.format(tracker_data[0] / tracker_data[1])
+                        percentage = f'{tracker_data[0] / tracker_data[1]:.1%}'
                     else:
                         percentage = '0%'
                     subject = tracker_data[2]
                     distribution_date = tracker_data[3]
                     monthly_stat.stat_data = \
-                        '{} \
-                        <tr id="{}"> \
-                        <td id="emailer_numerical">{}</td> \
-                        <td>{}<br>{}</td> \
-                        <td id="emailer_numerical">{}</td> \
-                        <td id="emailer_numerical">{}</td> \
-                        <td id="emailer_numerical">{}</td> \
-                        </tr>'.format(
-                            monthly_stat.stat_data,
-                            row_id,
-                            row_number_str,
-                            subject,
-                            distribution_date,
-                            sent,
-                            opens,
-                            percentage,
-                        )
+                        f'{monthly_stat.stat_data}' \
+                        f'<tr id="{row_id}">' \
+                        f'<td id="emailer_numerical">{row_number_str}</td>' \
+                        f'<td>{subject}<br>{distribution_date}</td>' \
+                        f'<td id="emailer_numerical">{sent}</td>' \
+                        f'<td id="emailer_numerical">{opens}</td>' \
+                        f'<td id="emailer_numerical">{percentage}</td>' \
+                        f'</tr>'
                     row_number += 1
                     sent_tally += tracker_data[1]
                     open_tally += tracker_data[0]
-            total_opens = '{:,}'.format(open_tally)
-            total_sent = '{:,}'.format(sent_tally)
+            total_opens = f'{open_tally:,}'
+            total_sent = f'{sent_tally:,}'
             if open_tally != 0 and sent_tally != 0:
-                total_percentage = '{:.1%}'.format(open_tally / sent_tally)
+                total_percentage = f'{open_tally / sent_tally:.1%}'
             else:
                 total_percentage = '0%'
             monthly_stat.stat_data = \
-                '{} \
-                <tr id="emailer_title_row"> \
-                <td><br><br></td> \
-                <td id="emailer_numerical">Totals:<br><br></td> \
-                <td id="emailer_numerical">{}<br><br></td> \
-                <td id="emailer_numerical">{}<br><br></td> \
-                <td id="emailer_numerical">{}<br><br></td> \
-                </tr>'.format(
-                    monthly_stat.stat_data,
-                    total_sent,
-                    total_opens,
-                    total_percentage,
-                )
+                f'{monthly_stat.stat_data}' \
+                f'<tr id="emailer_title_row">' \
+                f'<td><br><br></td>' \
+                f'<td id="emailer_numerical">Totals:<br><br></td>' \
+                f'<td id="emailer_numerical">{total_sent}<br><br></td>' \
+                f'<td id="emailer_numerical">{total_opens}<br><br></td>' \
+                f'<td id="emailer_numerical">{total_percentage}<br><br></td>' \
+                f'</tr>'
         monthly_stat.save()

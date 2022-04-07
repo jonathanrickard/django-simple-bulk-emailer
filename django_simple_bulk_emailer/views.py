@@ -107,14 +107,8 @@ def send_email(email_content, list_slug='', subscriber_key='', subject='', text_
         )
     else:
         unsubscribe_url = ''
-    subscriptions_url = '{}{}'.format(
-        protocol_domain,
-        manage_url,
-    )
-    quick_unsubscribe_url = '{}{}'.format(
-        protocol_domain,
-        unsubscribe_url,
-    )
+    subscriptions_url = f'{protocol_domain}{manage_url}'
+    quick_unsubscribe_url = f'{protocol_domain}{unsubscribe_url}'
     email_content['subscriptions_url'] = subscriptions_url
     email_content['quick_unsubscribe_url'] = quick_unsubscribe_url
     text_email = get_template(text_template).render(email_content)
@@ -149,7 +143,7 @@ def get_subscriptions(request):
     if request.method == 'POST':
         form = GetSubscriberForm(request.POST)
         if form.is_valid():
-            success_template = '{}/subscribe_success.html'.format(get_universal_page_directory())
+            success_template = f'{get_universal_page_directory()}/subscribe_success.html'
             ''' Begin checking for input in hidden field '''
             email = form.cleaned_data['email']
             if email:
@@ -170,8 +164,8 @@ def get_subscriptions(request):
             subscriber, created = Subscriber.objects.get_or_create(
                 subscriber_email=subscriber_email,
             )
-            text_template = '{}/subscribe_email_text.txt'.format(get_universal_email_directory())
-            html_template = '{}/subscribe_email_html.html'.format(get_universal_email_directory())
+            text_template = f'{get_universal_email_directory()}/subscribe_email_text.txt'
+            html_template = f'{get_universal_email_directory()}/subscribe_email_html.html'
             try:
                 subject = settings.EMAILER_SUBSCRIBE_SUBJECT
             except AttributeError:
@@ -191,7 +185,7 @@ def get_subscriptions(request):
     ''' Begin setting when form was submitted '''
     request.session['form_load_time'] = timezone.now().timestamp()
     ''' End setting when form was submitted '''
-    page_template = '{}/subscribe.html'.format(get_universal_page_directory())
+    page_template = f'{get_universal_page_directory()}/subscribe.html'
     subscription_set = Subscription.objects.filter(
         publicly_visible=True,
     )
@@ -219,7 +213,7 @@ def manage_subscriptions(request, subscriber_key):
             instance=subscriber,
         )
         if request.method == 'POST':
-            success_template = '{}/manage_subscriptions_success.html'.format(get_universal_page_directory())
+            success_template = f'{get_universal_page_directory()}/manage_subscriptions_success.html'
             if 'unsubscribe_all' in request.POST:
                 subscriber.subscriptions.clear()
                 return render(
@@ -238,7 +232,7 @@ def manage_subscriptions(request, subscriber_key):
                     request,
                     success_template,
                 )
-        page_template = '{}/manage_subscriptions.html'.format(get_universal_page_directory())
+        page_template = f'{get_universal_page_directory()}/manage_subscriptions.html'
         context = {
             'form': form,
             'subscriber': subscriber,
@@ -253,7 +247,7 @@ def manage_subscriptions(request, subscriber_key):
         subscribe_url = reverse(
             'django_simple_bulk_emailer:get_subscriptions',
         )
-        page_template = '{}/manage_subscriptions_error.html'.format(get_universal_page_directory())
+        page_template = f'{get_universal_page_directory()}/manage_subscriptions_error.html'
         context = {
             'subscribe_url': subscribe_url,
         }
@@ -279,7 +273,7 @@ def quick_unsubscribe(request, list_slug, subscriber_key):
                 'subscriber_key': subscriber.subscriber_key,
             }
         )
-        page_template = '{}/quick_unsubscribe.html'.format(get_universal_page_directory())
+        page_template = f'{get_universal_page_directory()}/quick_unsubscribe.html'
         context = {
             'list_name': subscription.list_name,
             'manage_url': manage_url,
@@ -293,7 +287,7 @@ def quick_unsubscribe(request, list_slug, subscriber_key):
         subscribe_url = reverse(
             'django_simple_bulk_emailer:get_subscriptions',
         )
-        page_template = '{}/manage_subscriptions_error.html'.format(get_universal_page_directory())
+        page_template = f'{get_universal_page_directory()}/manage_subscriptions_error.html'
         context = {
             'subscribe_url': subscribe_url,
         }
@@ -321,12 +315,13 @@ def email_preview(request, list_slug, pk):
             )
         except (ObjectDoesNotExist, ValueError) as e:
             raise Http404()
-        list_return = HttpResponseRedirect(reverse('admin:{}_{}_changelist'.format(
-            email_instance._meta.app_label,
-            email_instance._meta.model_name,
-        )))
-        page_template = '{}/email_template_html.html'.format(subscription.email_directory)
-        basic_template = '{}/bulk_email_preview.html'.format(get_universal_page_directory())
+        list_return = HttpResponseRedirect(
+            reverse(
+                f'admin:{email_instance._meta.app_label}_{email_instance._meta.model_name}_changelist'
+            )
+        )
+        page_template = f'{subscription.email_directory}/email_template_html.html'
+        basic_template = f'{get_universal_page_directory()}/bulk_email_preview.html'
         if request.method == "POST":
             if 'send_email' in request.POST:
                 email_instance.sendable = True
@@ -381,7 +376,7 @@ def list_view(request, list_slug):
                 email_set = paginator.page(1)
             except EmptyPage:
                 email_set = paginator.page(paginator.num_pages)
-        page_template = '{}/list_view.html'.format(subscription.page_directory)
+        page_template = f'{subscription.page_directory}/list_view.html'
         subscribe_url = reverse(
             'django_simple_bulk_emailer:get_subscriptions',
         )
@@ -416,7 +411,7 @@ def page_view(request, list_slug, year, month, day, pk, headline_slug, preview=F
             raise Http404()
         if not preview and not email_instance.published:
             raise Http404()
-        page_template = '{}/page_view.html'.format(subscription.page_directory)
+        page_template = f'{subscription.page_directory}/page_view.html'
         context = {
             'email_instance': email_instance,
         }
@@ -589,16 +584,8 @@ def mc_sync(request):
             base_url = reverse(
                 'django_simple_bulk_emailer:mc_sync',
             )
-            url_old = '{}{}?key={}'.format(
-                site_profile.protocol_domain(),
-                base_url,
-                secret_key_old,
-            )
-            url_new = '{}{}?key={}'.format(
-                site_profile.protocol_domain(),
-                base_url,
-                subscription.secret_key,
-            )
+            url_old = f'{site_profile.protocol_domain()}{base_url}?key={secret_key_old}'
+            url_new = f'{site_profile.protocol_domain()}{base_url}?key={subscription.secret_key}'
             try:
                 from mailchimp3 import (
                     MailChimp,
