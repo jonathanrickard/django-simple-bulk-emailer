@@ -69,7 +69,7 @@
         {% if email_instance.update_text %}
             <p>
                 <em>
-                    <strong>Updated at {{ email_instance.updated|time }} on {{ email_instance.updated|date:"N j, Y" }}:</strong> {{ email_instance.update_text }}
+                    <strong>Updated at {{ email_instance.update_datetime|time }} on {{ email_instance.update_datetime|date:"N j, Y" }}:</strong> {{ email_instance.update_text }}
                 </em>
             </p>
         {% endif %}

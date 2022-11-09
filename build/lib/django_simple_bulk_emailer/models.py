@@ -256,6 +256,10 @@ class BulkEmail(BaseMixin):
         'updates (optional)',
         blank=True,
     )
+    update_datetime = models.DateTimeField(
+        blank=True,
+        null=True,
+    )
     publication_date = models.DateField(
         default=timezone.localdate,
     )
@@ -416,6 +420,15 @@ class BulkEmail(BaseMixin):
             return ''
         else:
             return self.protocol_domain()
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            saved = BulkEmail.objects.get(pk=self.pk)
+            if self.update_text != saved.update_text:
+                self.update_datetime = timezone.now()
+            else:
+                self.update_datetime = saved.update_datetime
+        super().save(*args, **kwargs)
 
 
 class EmailImage(ProcessedImage):
