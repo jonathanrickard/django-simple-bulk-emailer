@@ -224,6 +224,10 @@ def create_user(permission_list=None):
     return user
 
 
+def dummy_get_response(request):
+    return None
+
+
 def create_request_response(self, get_post, page='1', key='empty', time_dict=None):
     reverse_name = f'django_simple_bulk_emailer:{self.view_name}'
     with self.settings(
@@ -250,7 +254,7 @@ def create_request_response(self, get_post, page='1', key='empty', time_dict=Non
             self.request.user = self.user
         except AttributeError:
             pass
-        SessionMiddleware().process_request(self.request)
+        SessionMiddleware(dummy_get_response).process_request(self.request)
         if time_dict:
             load_time = timezone.now() - timedelta(**time_dict)
             self.request.session['form_load_time'] = load_time.timestamp()

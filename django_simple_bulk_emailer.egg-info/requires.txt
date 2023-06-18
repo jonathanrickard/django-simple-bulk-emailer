@@ -1,4 +1,4 @@
-Django<4.0,>=3.2
+Django<5.0,>=3.2
 django-admin-sortable2>=1.0
 django-ckeditor>=6.2
 django-simple-file-handler>=0.3
