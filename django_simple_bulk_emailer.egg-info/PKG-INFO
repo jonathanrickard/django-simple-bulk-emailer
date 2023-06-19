@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: django-simple-bulk-emailer
-Version: 0.2.3
+Version: 0.2.4
 Summary: A Django app for sending bulk email
 Home-page: https://github.com/jonathanrickard/django-simple-bulk-emailer
 Author: Jonathan Rickard

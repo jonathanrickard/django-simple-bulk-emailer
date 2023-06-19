@@ -13,6 +13,7 @@ from django.db import (
 
 
 from adminsortable2.admin import (
+    SortableAdminBase,
     SortableAdminMixin,
     SortableInlineAdminMixin,
 )
@@ -369,7 +370,7 @@ class BulkEmailAdminForm(forms.ModelForm):
         }
 
 
-class BulkEmailAdmin(BaseAdmin):
+class BulkEmailAdmin(SortableAdminBase, BaseAdmin):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.readonly_fields = [
