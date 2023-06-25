@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: django-simple-bulk-emailer
-Version: 0.2.4
+Version: 0.2.5
 Summary: A Django app for sending bulk email
 Home-page: https://github.com/jonathanrickard/django-simple-bulk-emailer
 Author: Jonathan Rickard
@@ -10,16 +10,15 @@ Keywords: django,email
 Platform: UNKNOWN
 Classifier: Environment :: Web Environment
 Classifier: Framework :: Django
-Classifier: Framework :: Django :: 3.2
 Classifier: Framework :: Django :: 4.1
 Classifier: Framework :: Django :: 4.2
 Classifier: Operating System :: OS Independent
 Classifier: Programming Language :: Python
 Classifier: Programming Language :: Python :: 3
-Classifier: Programming Language :: Python :: 3.7
 Classifier: Programming Language :: Python :: 3.8
 Classifier: Programming Language :: Python :: 3.9
 Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
 Classifier: Intended Audience :: Developers
 Classifier: Topic :: Internet :: WWW/HTTP
 Classifier: License :: OSI Approved :: MIT License
