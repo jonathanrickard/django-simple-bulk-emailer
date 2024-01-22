@@ -1,6 +1,7 @@
 from datetime import (
     datetime,
     timedelta,
+    timezone,
 )
 from io import (
     BytesIO,
@@ -40,7 +41,7 @@ from django.urls import (
     reverse,
 )
 from django.utils import (
-    timezone,
+    timezone as django_timezone,
 )
 
 
@@ -186,7 +187,7 @@ def create_email(headline=None, list_name=None, body_text=None, published=False,
     return bulk_email
 
 
-def create_tracker(subject='Test email subject', subscription_name='Test subscription', send_complete=timezone.now(), number_sent=0, json_data=None):
+def create_tracker(subject='Test email subject', subscription_name='Test subscription', send_complete=django_timezone.now(), number_sent=0, json_data=None):
     if json_data is None:
         json_data = {}
     tracker = EmailTracker.objects.create(
@@ -256,7 +257,7 @@ def create_request_response(self, get_post, page='1', key='empty', time_dict=Non
             pass
         SessionMiddleware(dummy_get_response).process_request(self.request)
         if time_dict:
-            load_time = timezone.now() - timedelta(**time_dict)
+            load_time = django_timezone.now() - timedelta(**time_dict)
             self.request.session['form_load_time'] = load_time.timestamp()
             self.request.session.save()
         args = []
