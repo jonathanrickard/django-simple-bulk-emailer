@@ -70,3 +70,4 @@ django_simple_bulk_emailer/tests/test_forms.py
 django_simple_bulk_emailer/tests/test_models.py
 django_simple_bulk_emailer/tests/test_views.py
 django_simple_bulk_emailer/tests/urls.py
+django_simple_bulk_emailer/tests/templates/base.html
