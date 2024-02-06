@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: django_simple_bulk_emailer
-Version: 0.2.6
+Version: 0.2.7
 Summary: A Django app for sending bulk email
 Home-page: https://github.com/jonathanrickard/django-simple-bulk-emailer
 Author: Jonathan Rickard
@@ -22,10 +22,10 @@ Classifier: Intended Audience :: Developers
 Classifier: Topic :: Internet :: WWW/HTTP
 Classifier: License :: OSI Approved :: MIT License
 License-File: LICENSE
-Requires-Dist: Django<=5.0,>=4.2
+Requires-Dist: Django<5.1,>=4.2
 Requires-Dist: django-admin-sortable2>=2.1.8
 Requires-Dist: django-ckeditor>=6.2
-Requires-Dist: django-simple-file-handler>=0.3.4
+Requires-Dist: django-simple-file-handler>=0.3.5
 Requires-Dist: mailchimp3>=3.0
 Requires-Dist: Pillow>=9.0
 Requires-Dist: requests>=2.27
